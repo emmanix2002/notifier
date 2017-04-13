@@ -93,7 +93,7 @@ class RecipientCollection implements \ArrayAccess, \IteratorAggregate, \Countabl
     {
         $recipients = [];
         foreach ($this->addresses as $address) {
-            $recipients[] = new $this->recipientClass($address);
+            $recipients[] = $address instanceof RecipientInterface ? $address : new $this->recipientClass($address);
         }
         return new \ArrayIterator($recipients);
     }
@@ -132,7 +132,8 @@ class RecipientCollection implements \ArrayAccess, \IteratorAggregate, \Countabl
      */
     public function offsetGet($offset)
     {
-        return new $this->recipientClass($this->addresses[$offset]);
+        $address = $this->addresses[$offset];
+        return $address instanceof RecipientInterface ? $address : new $this->recipientClass($this->addresses[$offset]);
     }
     
     /**

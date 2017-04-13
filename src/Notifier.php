@@ -8,7 +8,9 @@ use Emmanix2002\Notifier\Channel\Channel;
 use Emmanix2002\Notifier\Channel\ChannelInterface;
 use Emmanix2002\Notifier\Message\MessageInterface;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
+use Monolog\Handler\ChromePHPHandler;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 class Notifier
 {
@@ -27,6 +29,11 @@ class Notifier
      * @var array
      */
     protected $processors;
+    
+    /**
+     * @var LoggerInterface
+     */
+    private static $logger;
     
     /**
      * Notifier constructor.
@@ -58,6 +65,8 @@ class Notifier
      * @param \string[]           ...$channelNames
      *
      * @return bool
+     * @throws \InvalidArgumentException
+     * @throws \UnderflowException
      */
     final public function notify(MessageInterface $message, RecipientCollection $recipients, string ...$channelNames)
     {
@@ -69,7 +78,7 @@ class Notifier
         }
         list($message, $recipients) = $this->process($message, $recipients);
         foreach ($this->channels as $channel) {
-            if (!in_array($channel->getName(), $channelNames)) {
+            if (!in_array($channel->getName(), $channelNames, true)) {
                 continue;
             }
             if (!$channel->notify($message, $recipients)) {
@@ -84,7 +93,6 @@ class Notifier
      * Loads the environment variables.
      * If this library was not installed using composer, it loads settings from the library's root directory, else
      * it tries to load settings from the directory which is the parent to the composer vendor directory.
-     *
      */
     public static function loadEnv()
     {
@@ -97,5 +105,19 @@ class Notifier
         } catch (InvalidPathException $e) {
             #($e->getMessage());
         }
+    }
+    
+    /**
+     * Returns the logger
+     *
+     * @return LoggerInterface
+     */
+    public static function getLogger(): LoggerInterface
+    {
+        if (self::$logger === null) {
+            self::$logger = new Logger(__CLASS__);
+            self::$logger->pushHandler(new ChromePHPHandler());
+        }
+        return self::$logger;
     }
 }

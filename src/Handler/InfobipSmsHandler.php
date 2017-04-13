@@ -5,6 +5,7 @@ namespace Emmanix2002\Notifier\Handler;
 use Emmanix2002\Notifier\Message\InfobipSmsMessage;
 use Emmanix2002\Notifier\Message\MessageInterface;
 use Emmanix2002\Notifier\Message\SmsMessage;
+use Emmanix2002\Notifier\Notifier;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
 use infobip\api\client\SendMultipleTextualSmsAdvanced;
 use infobip\api\configuration\BasicAuthConfiguration;
@@ -126,10 +127,10 @@ class InfobipSmsHandler implements HandlerInterface
                 $request->setBulkId(Uuid::uuid1()->toString());
             }
             $response = $this->getClient()->execute($request);
-            dump($response);
+            Notifier::getLogger()->debug('Response', ['data' => $response]);
         } catch (\InvalidArgumentException $e) {
             # since it failed, we pass the notification to the next handler irrespective of the choice by this handler
-            dump($e);
+            Notifier::getLogger()->error($e->getMessage());
             return true;
         }
         return $this->propagate();

@@ -32,4 +32,13 @@ interface ChannelInterface
      * @return bool
      */
     public function notify(MessageInterface $message, RecipientCollection $recipients): bool;
+    
+    /**
+     * Checks if the channel already has a particular processor set on it
+     * 
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasProcessor(string $name): bool;
 }

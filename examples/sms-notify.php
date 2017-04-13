@@ -14,7 +14,7 @@ Notifier::loadEnv();
 $notifier = new Notifier('sms', [
     new InfobipSmsHandler(getenv('INFOBIP_USERNAME'), getenv('INFOBIP_PASSWORD'), '2348136680801')
 ]);
-($notifier->getChannel('sms'))->pushProcessor(new SmsMessageProcessor());
+$notifier->getChannel('sms')->pushProcessor(new SmsMessageProcessor());
 dump($notifier);
 $message = new SmsMessage('Hi, this is the new notifier messaging you ');
 $recipients = new RecipientCollection(['2348136680801', '2348027593878'], PhoneRecipient::class);
