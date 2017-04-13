@@ -45,24 +45,12 @@ class SendgridEmailHandler implements HandlerInterface
             }
             $sendGrid = new \SendGrid($this->key);
             $validRecipients = [];
-            $substitutionKeys = [];
             foreach ($recipients as $recipient) {
                 if (!$recipient->getAddress()) {
                     continue;
                 }
                 $validRecipients[] = $recipient;
-                if (!$recipient instanceof SendgridEmailRecipient) {
-                    continue;
-                }
-                if (empty($recipient->getSubstitutions())) {
-                    continue;
-                }
-                $keys = array_keys($recipient->getSubstitutions());
-                $substitutionKeys = array_merge($substitutionKeys, $keys);
             }
-            $substitutionKeys = array_unique($substitutionKeys);
-            $substitutions = $this->processSubstitutions($validRecipients, $substitutionKeys);
-            # get the substitutions, if any
             $mail = new \SendGrid\Mail();
             $mail->setFrom(new Email($message->getFromName() ?: null, $message->getFrom()));
             $mail->setSubject($message->getSubject());
@@ -76,9 +64,11 @@ class SendgridEmailHandler implements HandlerInterface
                 # clone the shit
                 $personalization->addTo(new Email(null, $recipient->getAddress()));
                 # add the address
-                foreach ($substitutions as $key => $subSet) {
-                    $personalization->addSubstitution($key, $subSet[$id]);
-                    # add his/her substitutions
+                if ($recipient instanceof SendgridEmailRecipient && !empty($recipient->getSubstitutions())) {
+                    foreach ($recipient->getSubstitutions() as $key => $value) {
+                        $personalization->addSubstitution($key, $value);
+                        # add his/her substitutions
+                    }
                 }
                 $mail->addPersonalization($personalization);
                 # add the personalisation
@@ -103,63 +93,11 @@ class SendgridEmailHandler implements HandlerInterface
             # since it failed, we pass the notification to the next handler irrespective of the choice by this handler
             Notifier::getLogger()->error($e->getMessage());
             return true;
+        } catch (\Exception $e) {
+            Notifier::getLogger()->error($e->getMessage());
+            return true;
         }
         return $this->propagate();
-    }
-    
-    /**
-     * Creates the substitutions array from all the recipients passed
-     *
-     * @param array $recipients
-     * @param array $substitutionKeys
-     *
-     * @return array
-     */
-    private function processSubstitutions(array $recipients, array $substitutionKeys): array
-    {
-        $substitutions = [];
-        if (!empty($substitutionKeys)) {
-            foreach ($substitutionKeys as $subKey) {
-                $substitutions[$subKey] = [];
-            }
-        }
-        foreach ($recipients as $recipient) {
-            if (!$recipient instanceof SendgridEmailRecipient) {
-                $substitutions = $this->fillSlots($substitutionKeys, $substitutions);
-                continue;
-            }
-            if (empty($recipient->getSubstitutions())) {
-                $substitutions = $this->fillSlots($substitutionKeys, $substitutions);
-                continue;
-            }
-            if (empty($substitutionKeys)) {
-                continue;
-            }
-            $userSubs = $recipient->getSubstitutions();
-            foreach ($substitutionKeys as $subKey) {
-                $substitutions[$subKey][] = array_key_exists($subKey, $userSubs) ? $userSubs[$subKey] : '';
-            }
-        }
-        return $substitutions;
-    }
-    
-    /**
-     * Fills the empty slots in the substitutions
-     *
-     * @param array $keys
-     * @param array $substitutions
-     *
-     * @return array
-     */
-    private function fillSlots(array $keys, array $substitutions): array
-    {
-        if (empty($keys)) {
-            return [];
-        }
-        foreach ($keys as $key) {
-            $substitutions[$key][] = '';
-        }
-        return $substitutions;
     }
     
     /**

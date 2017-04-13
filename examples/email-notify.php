@@ -19,7 +19,7 @@ $message = new SendgridEmailMessage(
         'Welcome from Grace',
         null,
         null,
-        [':actionUrl' => 'https://revova.io']
+        [':actionUrl' => 'https://payroll.revova.io']
 );
 $message->setFromName('Revova Support')
         ->setTemplateId('1bc1e985-e975-4051-88e8-6bca813e75fd')
@@ -27,7 +27,7 @@ $message->setFromName('Revova Support')
 $names = ['Emmanuel', 'Jason'];
 $urls = [':actionUrl', ':actionUrl'];
 $recipients = [];
-$addresses = ['emmanix2002@gmail.com', 'emmanuel@afrinolly.com'];
+$addresses = ['id@domain.com', 'id2@domain.com'];
 foreach ($addresses as $id => $address) {
     $recipients[] = new SendgridEmailRecipient($address, ['-name-' => $names[$id], '-actionUrl-' => $urls[$id]]);
 }
