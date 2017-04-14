@@ -62,7 +62,7 @@ class SendgridEmailHandler implements HandlerInterface
                 # clone the shit
                 $personalization->addTo(new Email(null, $recipient->getAddress()));
                 # add the address
-                if ($recipient instanceof SendgridEmailRecipient) {
+                if ($recipient instanceof SendgridEmailRecipient && !empty($recipient->getSubstitutions())) {
                     foreach ($recipient->getSubstitutions() as $key => $value) {
                         $personalization->addSubstitution($key, $value);
                         # add recipient's substitutions
@@ -91,6 +91,9 @@ class SendgridEmailHandler implements HandlerInterface
             Notifier::getLogger()->debug('Response', ['data' => $response]);
         } catch (\InvalidArgumentException $e) {
             # since it failed, we pass the notification to the next handler irrespective of the choice by this handler
+            Notifier::getLogger()->error($e->getMessage());
+            return true;
+        } catch (\Exception $e) {
             Notifier::getLogger()->error($e->getMessage());
             return true;
         }

@@ -9,6 +9,7 @@ use Emmanix2002\Notifier\Channel\ChannelInterface;
 use Emmanix2002\Notifier\Message\MessageInterface;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
 use Monolog\Handler\ChromePHPHandler;
+use Monolog\Handler\ErrorLogHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
@@ -33,7 +34,7 @@ class Notifier
     /**
      * @var LoggerInterface
      */
-    private static $logger;
+    private static $logger = null;
     
     /**
      * @var Notifier
@@ -124,7 +125,7 @@ class Notifier
             $dotEnv = new Dotenv($loadDir);
             $dotEnv->load();
         } catch (InvalidPathException $e) {
-            #($e->getMessage());
+            self::getLogger()->error($e->getMessage());
         }
     }
     
@@ -137,7 +138,8 @@ class Notifier
     {
         if (self::$logger === null) {
             self::$logger = new Logger(__CLASS__);
-            self::$logger->pushHandler(new ChromePHPHandler());
+            self::$logger->pushHandler(new ChromePHPHandler(Logger::INFO));
+            self::$logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logger::WARNING));
         }
         return self::$logger;
     }
