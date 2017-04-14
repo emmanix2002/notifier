@@ -98,8 +98,8 @@ class InfobipSmsHandler implements HandlerInterface
     public function handle(MessageInterface $message, RecipientCollection $recipients): bool
     {
         try {
-            if (! ($message instanceof SmsMessage or $message instanceof InfobipSmsMessage)) {
-                throw new \InvalidArgumentException('The message need to be an instance of SmsMessage or InfobipSmsMessage');
+            if (!$message instanceof SmsMessage) {
+                throw new \InvalidArgumentException('The message need to be an instance of SmsMessage');
             }
             $destinations = [];
             $destination = new Destination();

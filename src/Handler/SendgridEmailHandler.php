@@ -8,7 +8,9 @@ use Emmanix2002\Notifier\Message\SendgridEmailMessage;
 use Emmanix2002\Notifier\Notifier;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
 use Emmanix2002\Notifier\Recipient\SendgridEmailRecipient;
+use SendGrid\Content;
 use SendGrid\Email;
+use SendGrid\Mail;
 use SendGrid\Personalization;
 
 class SendgridEmailHandler implements HandlerInterface
@@ -40,25 +42,21 @@ class SendgridEmailHandler implements HandlerInterface
     public function handle(MessageInterface $message, RecipientCollection $recipients): bool
     {
         try {
-            if (!($message instanceof SendgridEmailMessage || $message instanceof EmailMessage)) {
-                throw new \InvalidArgumentException('The message need to be an instance of EmailMessage or SendgridEmailMessage');
+            if (!$message instanceof EmailMessage) {
+                throw new \InvalidArgumentException('The message need to be an instance of EmailMessage');
             }
             $sendGrid = new \SendGrid($this->key);
-            $validRecipients = [];
-            foreach ($recipients as $recipient) {
-                if (!$recipient->getAddress()) {
-                    continue;
-                }
-                $validRecipients[] = $recipient;
-            }
-            $mail = new \SendGrid\Mail();
+            $mail = new Mail();
             $mail->setFrom(new Email($message->getFromName() ?: null, $message->getFrom()));
             $mail->setSubject($message->getSubject());
             $mail->setReplyTo(new Email(null, $message->getReplyTo() ?: $message->getFrom()));
             # set some general properties on the mail
+            $contentType = $message->isPlain() ? 'text/plain' : 'text/html';
+            $content = new Content($contentType, $message->getBody());
+            # create the content
             $personalizationTemplate = new Personalization();
             # we create the template object
-            foreach ($validRecipients as $id => $recipient) {
+            foreach ($recipients as $id => $recipient) {
                 # we process substitutions for all the recipients
                 $personalization = clone $personalizationTemplate;
                 # clone the shit
@@ -67,7 +65,7 @@ class SendgridEmailHandler implements HandlerInterface
                 if ($recipient instanceof SendgridEmailRecipient && !empty($recipient->getSubstitutions())) {
                     foreach ($recipient->getSubstitutions() as $key => $value) {
                         $personalization->addSubstitution($key, $value);
-                        # add his/her substitutions
+                        # add recipient's substitutions
                     }
                 }
                 $mail->addPersonalization($personalization);
@@ -76,6 +74,8 @@ class SendgridEmailHandler implements HandlerInterface
             if ($message instanceof SendgridEmailMessage) {
                 if ($message->usesTemplate()) {
                     $mail->setTemplateId($message->getBody());
+                } else {
+                    $mail->addContent($content);
                 }
                 if (!empty($message->getCategory())) {
                     $mail->addCategory($message->getCategory());

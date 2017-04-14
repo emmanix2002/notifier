@@ -59,12 +59,23 @@ class RecipientCollection implements \ArrayAccess, \IteratorAggregate, \Countabl
     }
     
     /**
+     * Returns the class container for the addresses
+     *
+     * @return string
+     */
+    public function getRecipientClass()
+    {
+        return $this->recipientClass;
+    }
+    
+    /**
      * Create a new collection instance
      *
      * @param array $addresses
      * @param       $recipientClass
      *
      * @return static
+     * @throws \InvalidArgumentException
      */
     public static function make(array $addresses = [], string $recipientClass)
     {

@@ -112,18 +112,6 @@ abstract class AbstractChannel implements ChannelInterface
     }
     
     /**
-     * Checks if the channel already has a particular processor set on it
-     *
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function hasProcessor(string $name): bool
-    {
-        return true;
-    }
-    
-    /**
      * @inheritdoc
      */
     public function notify(MessageInterface $message, RecipientCollection $recipients): bool

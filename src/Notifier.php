@@ -37,6 +37,11 @@ class Notifier
     private static $logger = null;
     
     /**
+     * @var Notifier
+     */
+    private static $instance;
+    
+    /**
      * Notifier constructor.
      * It automatically creates a new channel with the provided name, and sets the handlers on it
      *
@@ -46,6 +51,22 @@ class Notifier
     public function __construct(string $name, array $handlers = [])
     {
         $this->addChannel(Channel::named($name, $handlers));
+    }
+    
+    /**
+     * Provides a static interface to getting the Notifier
+     *
+     * @param string $name
+     * @param array  $handlers
+     *
+     * @return static
+     */
+    public static function instance(string $name, array $handlers = [])
+    {
+        if (self::$instance === null) {
+            self::$instance = new static($name, $handlers);
+        }
+        return self::$instance;
     }
     
     /**
