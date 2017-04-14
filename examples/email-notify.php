@@ -15,13 +15,13 @@ $notifier = new Notifier('sendgrid', [
 ]);
 dump($notifier);
 $message = new SendgridEmailMessage(
-        'hello@revova.io',
+        'from@example.com',
         'Welcome from Grace',
         null,
         null,
-        [':actionUrl' => 'https://payroll.revova.io']
+        [':actionUrl' => 'https://make-stuff-happen.io']
 );
-$message->setFromName('Revova Support')
+$message->setFromName('Support')
         ->setTemplateId('1bc1e985-e975-4051-88e8-6bca813e75fd')
         ->setCategory('notifier-test');
 $names = ['Emmanuel', 'Jason'];

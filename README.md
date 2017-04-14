@@ -1,6 +1,10 @@
 Notifier
 ==========
-A library for handling and processing notifications. 
+A library for handling and processing notifications.   
+
+* [Installation](#installation)
+* [Introduction](#introduction)
+* [Process Flow](#process-flow)
 
 ## Installation
 To install the package, you simply run:
@@ -48,3 +52,5 @@ You see `(Processors)` appear twice, here's why:
 - The first is triggered for _processors_ added to the `Notifier`; while
 - The second is triggered for _processors_ added to the `Channel`   
 
+## Usage
+See the `examples` directory for more.
