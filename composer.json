@@ -46,11 +46,6 @@
     "test": "phpunit",
     "format": "phpcbf --standard=psr2 src/"
   },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "1.0-dev"
-    }
-  },
   "suggest": {
     "sendgrid/sendgrid": "Required for using the Sendgrid email handler",
     "infobip/infobip-api-php-client": "Required for using the Infobip SMS handler",
