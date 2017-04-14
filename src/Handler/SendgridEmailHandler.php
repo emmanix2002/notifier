@@ -8,7 +8,9 @@ use Emmanix2002\Notifier\Message\SendgridEmailMessage;
 use Emmanix2002\Notifier\Notifier;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
 use Emmanix2002\Notifier\Recipient\SendgridEmailRecipient;
+use SendGrid\Content;
 use SendGrid\Email;
+use SendGrid\Mail;
 use SendGrid\Personalization;
 
 class SendgridEmailHandler implements HandlerInterface
@@ -40,45 +42,31 @@ class SendgridEmailHandler implements HandlerInterface
     public function handle(MessageInterface $message, RecipientCollection $recipients): bool
     {
         try {
-            if (!($message instanceof SendgridEmailMessage || $message instanceof EmailMessage)) {
-                throw new \InvalidArgumentException('The message need to be an instance of EmailMessage or SendgridEmailMessage');
+            if (!$message instanceof EmailMessage) {
+                throw new \InvalidArgumentException('The message need to be an instance of EmailMessage');
             }
             $sendGrid = new \SendGrid($this->key);
-            $validRecipients = [];
-            $substitutionKeys = [];
-            foreach ($recipients as $recipient) {
-                if (!$recipient->getAddress()) {
-                    continue;
-                }
-                $validRecipients[] = $recipient;
-                if (!$recipient instanceof SendgridEmailRecipient) {
-                    continue;
-                }
-                if (empty($recipient->getSubstitutions())) {
-                    continue;
-                }
-                $keys = array_keys($recipient->getSubstitutions());
-                $substitutionKeys = array_merge($substitutionKeys, $keys);
-            }
-            $substitutionKeys = array_unique($substitutionKeys);
-            $substitutions = $this->processSubstitutions($validRecipients, $substitutionKeys);
-            # get the substitutions, if any
-            $mail = new \SendGrid\Mail();
+            $mail = new Mail();
             $mail->setFrom(new Email($message->getFromName() ?: null, $message->getFrom()));
             $mail->setSubject($message->getSubject());
             $mail->setReplyTo(new Email(null, $message->getReplyTo() ?: $message->getFrom()));
             # set some general properties on the mail
+            $contentType = $message->isPlain() ? 'text/plain' : 'text/html';
+            $content = new Content($contentType, $message->getBody());
+            # create the content
             $personalizationTemplate = new Personalization();
             # we create the template object
-            foreach ($validRecipients as $id => $recipient) {
+            foreach ($recipients as $id => $recipient) {
                 # we process substitutions for all the recipients
                 $personalization = clone $personalizationTemplate;
                 # clone the shit
                 $personalization->addTo(new Email(null, $recipient->getAddress()));
                 # add the address
-                foreach ($substitutions as $key => $subSet) {
-                    $personalization->addSubstitution($key, $subSet[$id]);
-                    # add his/her substitutions
+                if ($recipient instanceof SendgridEmailRecipient) {
+                    foreach ($recipient->getSubstitutions() as $key => $value) {
+                        $personalization->addSubstitution($key, $value);
+                        # add recipient's substitutions
+                    }
                 }
                 $mail->addPersonalization($personalization);
                 # add the personalisation
@@ -86,6 +74,8 @@ class SendgridEmailHandler implements HandlerInterface
             if ($message instanceof SendgridEmailMessage) {
                 if ($message->usesTemplate()) {
                     $mail->setTemplateId($message->getBody());
+                } else {
+                    $mail->addContent($content);
                 }
                 if (!empty($message->getCategory())) {
                     $mail->addCategory($message->getCategory());
@@ -105,61 +95,6 @@ class SendgridEmailHandler implements HandlerInterface
             return true;
         }
         return $this->propagate();
-    }
-    
-    /**
-     * Creates the substitutions array from all the recipients passed
-     *
-     * @param array $recipients
-     * @param array $substitutionKeys
-     *
-     * @return array
-     */
-    private function processSubstitutions(array $recipients, array $substitutionKeys): array
-    {
-        $substitutions = [];
-        if (!empty($substitutionKeys)) {
-            foreach ($substitutionKeys as $subKey) {
-                $substitutions[$subKey] = [];
-            }
-        }
-        foreach ($recipients as $recipient) {
-            if (!$recipient instanceof SendgridEmailRecipient) {
-                $substitutions = $this->fillSlots($substitutionKeys, $substitutions);
-                continue;
-            }
-            if (empty($recipient->getSubstitutions())) {
-                $substitutions = $this->fillSlots($substitutionKeys, $substitutions);
-                continue;
-            }
-            if (empty($substitutionKeys)) {
-                continue;
-            }
-            $userSubs = $recipient->getSubstitutions();
-            foreach ($substitutionKeys as $subKey) {
-                $substitutions[$subKey][] = array_key_exists($subKey, $userSubs) ? $userSubs[$subKey] : '';
-            }
-        }
-        return $substitutions;
-    }
-    
-    /**
-     * Fills the empty slots in the substitutions
-     *
-     * @param array $keys
-     * @param array $substitutions
-     *
-     * @return array
-     */
-    private function fillSlots(array $keys, array $substitutions): array
-    {
-        if (empty($keys)) {
-            return [];
-        }
-        foreach ($keys as $key) {
-            $substitutions[$key][] = '';
-        }
-        return $substitutions;
     }
     
     /**

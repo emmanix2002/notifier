@@ -4,6 +4,9 @@ namespace Emmanix2002\Notifier\Message;
 
 class SmsMessage implements MessageInterface
 {
+    /**
+     * @var string
+     */
     protected $message;
     
     public function __construct(string $message = null)

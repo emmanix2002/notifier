@@ -3,7 +3,6 @@
 namespace Emmanix2002\Notifier\Processor;
 
 use Emmanix2002\Notifier\Message\MessageInterface;
-use Emmanix2002\Notifier\Recipient\EmailRecipient;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
 
 class EmailValidationProcessor
@@ -18,6 +17,6 @@ class EmailValidationProcessor
             }
             $validRecipients[] = $validated;
         }
-        return [$message, new RecipientCollection($validRecipients, EmailRecipient::class)];
+        return [$message, new RecipientCollection($validRecipients, $recipients->getRecipientClass())];
     }
 }
