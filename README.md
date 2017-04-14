@@ -1,5 +1,10 @@
 Notifier
 ==========
+[![Latest Version on Packagist][ico-version]][link-packagist]
+[![Software License][ico-license]](LICENSE.md)
+[![Build Status][ico-travis]][link-travis]
+[![Total Downloads][ico-downloads]][link-downloads]
+
 A library for handling and processing notifications.   
 
 * [Installation](#installation)
@@ -54,3 +59,13 @@ You see `(Processors)` appear twice, here's why:
 
 ## Usage
 See the `examples` directory for more.
+
+[ico-version]: https://img.shields.io/packagist/v/emmanix2002/notifier.svg?style=flat-square
+[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/emmanix2002/notifier/master.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/emmanix2002/notifier.svg?style=flat-square
+
+[link-packagist]: https://packagist.org/packages/emmanix2002/notifier
+[link-travis]: https://travis-ci.org/emmanix2002/notifier
+[link-downloads]: https://packagist.org/packages/emmanix2002/notifier
+[link-author]: https://github.com/emmanix2002
