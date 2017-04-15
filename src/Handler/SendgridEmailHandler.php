@@ -13,7 +13,7 @@ use SendGrid\Email;
 use SendGrid\Mail;
 use SendGrid\Personalization;
 
-class SendgridEmailHandler implements HandlerInterface
+class SendgridEmailHandler extends AbstractHandler
 {
     /**
      * @var string
@@ -98,15 +98,5 @@ class SendgridEmailHandler implements HandlerInterface
             return true;
         }
         return $this->propagate();
-    }
-    
-    /**
-     * Whether or not to continue propagation
-     *
-     * @return bool
-     */
-    public function propagate(): bool
-    {
-        return false;
     }
 }

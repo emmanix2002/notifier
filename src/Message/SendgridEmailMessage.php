@@ -9,6 +9,9 @@ class SendgridEmailMessage extends EmailMessage
      */
     private $sections;
     
+    /**
+     * @var string
+     */
     private $category;
     
     /**
@@ -16,6 +19,15 @@ class SendgridEmailMessage extends EmailMessage
      */
     private $usesTemplate;
     
+    /**
+     * SendgridEmailMessage constructor.
+     *
+     * @param string|null $from
+     * @param string|null $subject
+     * @param string|null $body
+     * @param string|null $replyTo
+     * @param array       $sections
+     */
     public function __construct(
             string $from = null,
             string $subject = null,

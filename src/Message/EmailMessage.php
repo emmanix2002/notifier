@@ -21,6 +21,9 @@ class EmailMessage implements MessageInterface
      */
     protected $from;
     
+    /**
+     * @var string
+     */
     protected $fromName;
     
     /**
