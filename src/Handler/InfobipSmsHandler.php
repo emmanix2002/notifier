@@ -22,7 +22,7 @@ use Ramsey\Uuid\Uuid;
  * @package Emmanix2002\Notifier\Handler
  * @link https://dev.infobip.com/docs/fully-featured-textual-message
  */
-class InfobipSmsHandler implements HandlerInterface
+class InfobipSmsHandler extends AbstractHandler
 {
     /**
      * @var string
@@ -134,15 +134,5 @@ class InfobipSmsHandler implements HandlerInterface
             return true;
         }
         return $this->propagate();
-    }
-    
-    /**
-     * Whether or not to continue propagation
-     *
-     * @return bool
-     */
-    public function propagate(): bool
-    {
-        return false;
     }
 }

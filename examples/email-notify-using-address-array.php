@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', '1');
 
 use Emmanix2002\Notifier\Handler\SendgridEmailHandler;
 use Emmanix2002\Notifier\Message\SendgridEmailMessage;
@@ -15,26 +16,23 @@ $notifier = new Notifier('sendgrid', [
 ]);
 dump($notifier);
 $message = new SendgridEmailMessage(
-        'from@example.com',
-        'Welcome from Grace',
-        null,
-        null,
-        [':actionUrl' => 'https://make-stuff-happen.io']
+    'from@example.com',
+    'Welcome from Grace',
+    null,
+    null,
+    [':actionUrl' => 'https://make-stuff-happen.io']
 );
 $message->setFromName('Support')
         ->setTemplateId('1bc1e985-e975-4051-88e8-6bca813e75fd')
         ->setCategory('notifier-test');
-$names = ['Emmanuel', 'Jason'];
-$urls = [':actionUrl', ':actionUrl'];
-$destinations = [];
-$addresses = ['id@domain.com', 'id2@domain.com'];
-foreach ($addresses as $id => $address) {
-    $destinations[] = new SendgridEmailRecipient($address, ['-name-' => $names[$id], '-actionUrl-' => $urls[$id]]);
-}
-$recipients = new RecipientCollection($destinations, SendgridEmailRecipient::class);
+$addresses = [
+    ['id@domain.com', ['-name' => 'Emmanuel', '-actionUrl-' => ':actionUrl']],
+    ['id2@domain.com', ['-name' => 'Jason', '-actionUrl-' => ':actionUrl']]
+];
+$recipients = new RecipientCollection($addresses, SendgridEmailRecipient::class);
 dump($recipients);
 $notifier->notify(
-        $message,
-        $recipients,
-        'sendgrid'
+    $message,
+    $recipients,
+    'sendgrid'
 );
