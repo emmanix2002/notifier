@@ -10,18 +10,118 @@ class EmailRecipient implements RecipientInterface
     protected $email;
     
     /**
+     * @var array
+     */
+    protected $cc = [];
+    
+    /**
+     * @var array
+     */
+    protected $bcc = [];
+    
+    /**
      * EmailRecipient constructor.
      *
      * @param string $email
+     * @param array  $cc
+     * @param array  $bcc
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $email)
+    public function __construct(string $email, array $cc = [], array $bcc = [])
     {
         if (!self::validateAddress($email)) {
             throw new \InvalidArgumentException('An invalid email address was provided');
         }
         $this->email = $email;
+        $this->setCc($cc)
+             ->setBcc($bcc);
+    }
+    
+    /**
+     * Adds an address to the CC list
+     *
+     * @param string $email
+     *
+     * @return $this
+     */
+    public function addCc(string $email)
+    {
+        if (!self::validateAddress($email)) {
+            return $this;
+        }
+        $this->cc[] = $email;
+        return $this;
+    }
+    
+    /**
+     * Adds an email to the BCC list
+     *
+     * @param string $email
+     *
+     * @return $this
+     */
+    public function addBcc(string $email)
+    {
+        if (!self::validateAddress($email)) {
+            return $this;
+        }
+        $this->bcc[] = $email;
+        return $this;
+    }
+    
+    /**
+     * Sets the CC addresses
+     *
+     * @param array $emails
+     *
+     * @return $this
+     */
+    public function setCc(array $emails)
+    {
+        if (empty($emails)) {
+            return $this;
+        }
+        $filtered = array_filter($emails, [EmailRecipient::class, 'validateAddress']);
+        $this->cc = $filtered;
+        return $this;
+    }
+    
+    /**
+     * Sets the BCC copy addresses
+     *
+     * @param array $emails
+     *
+     * @return $this
+     */
+    public function setBcc(array $emails)
+    {
+        if (empty($emails)) {
+            return $this;
+        }
+        $filtered = array_filter($emails, [EmailRecipient::class, 'validateAddress']);
+        $this->bcc = $filtered;
+        return $this;
+    }
+    
+    /**
+     * Returns the BCC addresses
+     *
+     * @return array
+     */
+    public function getBcc(): array
+    {
+        return (array) $this->bcc;
+    }
+    
+    /**
+     * Returns the CC addresses
+     *
+     * @return array
+     */
+    public function getCc(): array
+    {
+        return (array) $this->cc;
     }
     
     /**

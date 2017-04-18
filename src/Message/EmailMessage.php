@@ -32,16 +32,6 @@ class EmailMessage implements MessageInterface
     protected $replyTo;
     
     /**
-     * @var array
-     */
-    protected $cc;
-    
-    /**
-     * @var array
-     */
-    protected $bcc;
-    
-    /**
      * @var bool
      */
     protected $isPlain;
@@ -62,8 +52,6 @@ class EmailMessage implements MessageInterface
         $this->body = (string) $body;
         $this->from = !empty($from) ? (string) $from : null;
         $this->replyTo = !empty($replyTo) ? (string) $replyTo : $this->from;
-        $this->bcc = [];
-        $this->cc = [];
         $this->isPlain = true;
     }
     
@@ -128,48 +116,6 @@ class EmailMessage implements MessageInterface
     }
     
     /**
-     * Sets the BCC copy addresses
-     *
-     * @param array $emails
-     *
-     * @return $this
-     */
-    public function setBcc(array $emails)
-    {
-        if (empty($emails)) {
-            return $this;
-        }
-        foreach ($emails as $email) {
-            if (!EmailRecipient::validateAddress($email)) {
-                continue;
-            }
-            $this->bcc[] = $email;
-        }
-        return $this;
-    }
-    
-    /**
-     * Sets the CC copy addresses
-     *
-     * @param array $emails
-     *
-     * @return $this
-     */
-    public function setCc(array $emails)
-    {
-        if (empty($emails)) {
-            return $this;
-        }
-        foreach ($emails as $email) {
-            if (!EmailRecipient::validateAddress($email)) {
-                continue;
-            }
-            $this->cc[] = $email;
-        }
-        return $this;
-    }
-    
-    /**
      * Sets the message as a HTML message
      *
      * @param string $html
@@ -227,22 +173,6 @@ class EmailMessage implements MessageInterface
     public function getSubject(): string
     {
         return (string) $this->subject;
-    }
-    
-    /**
-     * @return array
-     */
-    public function getBcc(): array
-    {
-        return $this->bcc;
-    }
-    
-    /**
-     * @return array
-     */
-    public function getCc(): array
-    {
-        return $this->cc;
     }
     
     /**

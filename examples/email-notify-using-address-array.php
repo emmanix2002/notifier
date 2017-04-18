@@ -26,7 +26,7 @@ $message->setFromName('Support')
         ->setTemplateId('1bc1e985-e975-4051-88e8-6bca813e75fd')
         ->setCategory('notifier-test');
 $addresses = [
-    ['id@domain.com', ['-name' => 'Emmanuel', '-actionUrl-' => ':actionUrl']],
+    ['id@domain.com', ['-name' => 'Emmanuel', '-actionUrl-' => ':actionUrl'], ['id3@domain.com', 'id', 'id5@domain.io']],
     ['id2@domain.com', ['-name' => 'Jason', '-actionUrl-' => ':actionUrl']]
 ];
 $recipients = new RecipientCollection($addresses, SendgridEmailRecipient::class);
