@@ -68,6 +68,16 @@ class SendgridEmailHandler extends AbstractHandler
                         # add recipient's substitutions
                     }
                 }
+                if (!empty($recipient->getCc())) {
+                    foreach ($recipient->getCc() as $cc) {
+                        $personalization->addCc(new Email(null, $cc));
+                    }
+                }
+                if (!empty($recipient->getBcc())) {
+                    foreach ($recipient->getBcc() as $bcc) {
+                        $personalization->addBcc(new Email(null, $bcc));
+                    }
+                }
                 $mail->addPersonalization($personalization);
                 # add the personalisation
             }

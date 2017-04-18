@@ -14,12 +14,14 @@ class SendgridEmailRecipient extends EmailRecipient
      *
      * @param string $email
      * @param array  $substitutions
+     * @param array  $cc
+     * @param array  $bcc
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $email, array $substitutions = [])
+    public function __construct(string $email, array $substitutions = [], array $cc = [], array $bcc = [])
     {
-        parent::__construct($email);
+        parent::__construct($email, $cc, $bcc);
         $this->substitutions = (array) $substitutions;
     }
     
