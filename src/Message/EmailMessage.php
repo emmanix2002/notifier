@@ -39,10 +39,10 @@ class EmailMessage implements MessageInterface
     /**
      * EmailMessage constructor.
      *
-     * @param string|null $from
-     * @param string|null $subject
-     * @param string|null $body
-     * @param string|null $replyTo
+     * @param string|null $from     the sender email address
+     * @param string|null $subject  the email subject
+     * @param string|null $body     the plain text email message
+     * @param string|null $replyTo  the replyTo email address (default: $from)
      */
     public function __construct(string $from = null, string $subject = null, string $body = null, string $replyTo = null)
     {
@@ -214,9 +214,10 @@ class EmailMessage implements MessageInterface
         if (!$message instanceof EmailMessage) {
             throw new \InvalidArgumentException('setMessage expects an instance of EmailMessage');
         }
+        $this->from = $message->getFrom();
+        $this->fromName = $message->getFromName();
+        $this->subject = $message->getSubject();
         $this->body = $message->getBody();
-        $this->bcc = $message->getBcc();
-        $this->cc = $message->getCc();
         $this->replyTo = $message->getReplyTo();
         $this->isPlain = $message->isPlain();
         return $this;

@@ -22,11 +22,11 @@ class SendgridEmailMessage extends EmailMessage
     /**
      * SendgridEmailMessage constructor.
      *
-     * @param string|null $from
-     * @param string|null $subject
-     * @param string|null $body
-     * @param string|null $replyTo
-     * @param array       $sections
+     * @param string|null $from         the sender email address
+     * @param string|null $subject      the email subject
+     * @param string|null $body         the plain text email message
+     * @param string|null $replyTo      the replyTo email address (default: $from)
+     * @param array       $sections     associative array of sections to be used for substitutions in a template
      */
     public function __construct(
             string $from = null,
@@ -38,7 +38,6 @@ class SendgridEmailMessage extends EmailMessage
         parent::__construct($from, $subject, $body, $replyTo);
         $this->sections = $sections;
         $this->usesTemplate = false;
-        $this->category = null;
     }
     
     /**

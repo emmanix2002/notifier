@@ -16,20 +16,17 @@ $notifier = new Notifier('sendgrid', [
 dump($notifier);
 $message = new SendgridEmailMessage(
         'from@example.com',
-        'Welcome from Grace',
+        'Welcome from Us',
         null,
-        null,
-        [':actionUrl' => 'https://make-stuff-happen.io']
+        null
 );
 $message->setFromName('Support')
-        ->setTemplateId('1bc1e985-e975-4051-88e8-6bca813e75fd')
+        ->setHtml('<html><body><strong>Hello</strong> world,<br>this is an email!</body></html>')
         ->setCategory('notifier-test');
-$names = ['Emmanuel', 'Jason'];
-$urls = [':actionUrl', ':actionUrl'];
 $destinations = [];
 $addresses = ['id@domain.com', 'id2@domain.com'];
 foreach ($addresses as $id => $address) {
-    $destinations[] = new SendgridEmailRecipient($address, ['-name-' => $names[$id], '-actionUrl-' => $urls[$id]]);
+    $destinations[] = new SendgridEmailRecipient($address);
 }
 $recipients = new RecipientCollection($destinations, SendgridEmailRecipient::class);
 dump($recipients);
