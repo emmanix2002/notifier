@@ -24,7 +24,7 @@ $message->setFromName('Support')
         ->setHtml('<html><body><strong>Hello</strong> world,<br>this is an email!</body></html>')
         ->setCategory('notifier-test');
 $destinations = [];
-$addresses = ['emmanix2002@gmail.com', 'emmanuel@afrinolly.com'];
+$addresses = ['id@domain.com', 'id2@domain.com'];
 foreach ($addresses as $id => $address) {
     $destinations[] = new SendgridEmailRecipient($address);
 }
