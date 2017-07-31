@@ -20,7 +20,7 @@ interface HandlerInterface
      * @param MessageInterface    $message
      * @param RecipientCollection $recipients
      *
-     * @return bool
+     * @return mixed
      */
-    public function handle(MessageInterface $message, RecipientCollection $recipients): bool;
+    public function handle(MessageInterface $message, RecipientCollection $recipients);
 }
