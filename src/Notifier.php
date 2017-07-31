@@ -86,7 +86,7 @@ class Notifier
      * @param RecipientCollection $recipients
      * @param \string[]           ...$channelNames
      *
-     * @return bool
+     * @return mixed
      * @throws \InvalidArgumentException
      * @throws \UnderflowException
      */
