@@ -26,6 +26,7 @@ $notifier->getChannel('sms')->pushProcessor(function (MessageInterface $message,
 });
 dump($notifier);
 $message = new SmsMessage('Hi, the processor will add asterisks to fill the message');
-$recipients = new RecipientCollection(['2348136680801', '2348027593878', '2348067319894'], PhoneRecipient::class);
+$recipients = new RecipientCollection(['23481234567890'], PhoneRecipient::class);
 dump($recipients);
-$notifier->notify($message, $recipients, 'sms');
+$r = $notifier->notify($message, $recipients, 'sms');
+dump($r);

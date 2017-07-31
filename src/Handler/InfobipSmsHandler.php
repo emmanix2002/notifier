@@ -92,10 +92,10 @@ class InfobipSmsHandler extends AbstractHandler
      * @param MessageInterface    $message
      * @param RecipientCollection $recipients
      *
-     * @return bool
+     * @return mixed
      * @throws \InvalidArgumentException
      */
-    public function handle(MessageInterface $message, RecipientCollection $recipients): bool
+    public function handle(MessageInterface $message, RecipientCollection $recipients)
     {
         try {
             if (!$message instanceof SmsMessage) {
@@ -127,11 +127,12 @@ class InfobipSmsHandler extends AbstractHandler
                 $request->setBulkId(Uuid::uuid1()->toString());
             }
             $response = $this->getClient()->execute($request);
-            Notifier::getLogger()->debug('Response', ['data' => $response]);
+            if (!$this->propagate()) {
+                return $response;
+            }
         } catch (\InvalidArgumentException $e) {
             # since it failed, we pass the notification to the next handler irrespective of the choice by this handler
             Notifier::getLogger()->error($e->getMessage());
-            return true;
         }
         return $this->propagate();
     }

@@ -141,7 +141,6 @@ class Notifier
     {
         if (self::$logger === null) {
             self::$logger = new Logger(__CLASS__);
-            self::$logger->pushHandler(new ChromePHPHandler(Logger::INFO));
             self::$logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logger::WARNING));
         }
         return self::$logger;
