@@ -114,19 +114,22 @@ abstract class AbstractChannel implements ChannelInterface
     /**
      * @inheritdoc
      */
-    public function notify(MessageInterface $message, RecipientCollection $recipients): bool
+    public function notify(MessageInterface $message, RecipientCollection $recipients)
     {
         if (empty($this->handlers)) {
             # no handler here -- so we just bubble to the next channel
             return true;
         }
+        $response = null;
         list($message, $recipients) = $this->process($message, $recipients);
         foreach ($this->handlers as $handler) {
-            if (!$handler->handle($message, $recipients)) {
+            $response = $handler->handle($message, $recipients);
+            # send for processing
+            if (is_bool($response) && !$response) {
                 # stop propagation
                 break;
             }
         }
-        return $this->propagate();
+        return $response ?: $this->propagate();
     }
 }

@@ -99,6 +99,7 @@ class Notifier
             throw new \InvalidArgumentException('You need to specify at least one channel to send the message through');
         }
         list($message, $recipients) = $this->process($message, $recipients);
+        $response = null;
         foreach ($this->channels as $channel) {
             if (!in_array($channel->getName(), $channelNames, true)) {
                 continue;
@@ -108,7 +109,7 @@ class Notifier
                 break;
             }
         }
-        return true;
+        return $response ?: true;
     }
     
     /**

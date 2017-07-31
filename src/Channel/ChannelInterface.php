@@ -23,13 +23,14 @@ interface ChannelInterface
     
     /**
      * Notifies the channel to process the message for the provided recipients.
-     * The channel will return either TRUE (to continue notifying other channels specified), or FALSE (to stop from
-     * sending to other channels)
+     * The channel will return either TRUE (to continue notifying other channels specified), FALSE (to stop from
+     * sending to other channels), or a Non-Boolean value to both stop propagating and return to the caller as
+     * a response.
      *
      * @param MessageInterface    $message
      * @param RecipientCollection $recipients
      *
-     * @return bool
+     * @return mixed
      */
-    public function notify(MessageInterface $message, RecipientCollection $recipients): bool;
+    public function notify(MessageInterface $message, RecipientCollection $recipients);
 }
