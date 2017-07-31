@@ -104,7 +104,8 @@ class Notifier
             if (!in_array($channel->getName(), $channelNames, true)) {
                 continue;
             }
-            if (!$channel->notify($message, $recipients)) {
+            $response = $channel->notify($message, $recipients);
+            if (is_bool($response) && !$response) {
                 # this channel does not support bubbling
                 break;
             }
