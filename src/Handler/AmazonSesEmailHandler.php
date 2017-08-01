@@ -32,6 +32,7 @@ class AmazonSesEmailHandler extends AbstractHandler
     public function __construct(SesClient $client = null, bool $stopPropagation = true)
     {
         $this->sesClient = $client;
+        $this->stopPropagation = $stopPropagation;
     }
 
     /**
@@ -40,6 +41,19 @@ class AmazonSesEmailHandler extends AbstractHandler
     public function propagate(): bool
     {
         return !$this->stopPropagation;
+    }
+
+    /**
+     * Sets the SesClient to use with the handler
+     *
+     * @param SesClient $client
+     *
+     * @return $this
+     */
+    public function setClient(SesClient $client)
+    {
+        $this->sesClient = $client;
+        return $this;
     }
 
     /**
