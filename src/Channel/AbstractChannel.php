@@ -125,7 +125,7 @@ abstract class AbstractChannel implements ChannelInterface
         foreach ($this->handlers as $handler) {
             $response = $handler->handle($message, $recipients);
             # send for processing
-            if (is_bool($response) && !$response) {
+            if (!is_bool($response) || !$response) {
                 # stop propagation
                 break;
             }
