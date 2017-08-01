@@ -5,7 +5,6 @@ namespace Emmanix2002\Notifier\Handler;
 use Emmanix2002\Notifier\Message\EmailMessage;
 use Emmanix2002\Notifier\Message\MessageInterface;
 use Emmanix2002\Notifier\Message\SendgridEmailMessage;
-use Emmanix2002\Notifier\Notifier;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
 use Emmanix2002\Notifier\Recipient\SendgridEmailRecipient;
 use SendGrid\Content;
@@ -117,11 +116,8 @@ class SendgridEmailHandler extends AbstractHandler
                 # not going any further
                 return $response;
             }
-        } catch (\InvalidArgumentException $e) {
-            # since it failed, we pass the notification to the next handler irrespective of the choice by this handler
-            Notifier::getLogger()->error($e->getMessage());
-        } catch (\Exception $e) {
-            Notifier::getLogger()->error($e->getMessage());
+        } catch (\Throwable $e) {
+            $this->processException($e);
         }
         return $this->propagate();
     }

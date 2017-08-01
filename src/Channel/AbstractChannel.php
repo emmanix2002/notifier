@@ -122,6 +122,7 @@ abstract class AbstractChannel implements ChannelInterface
         }
         $response = null;
         list($message, $recipients) = $this->process($message, $recipients);
+        # send for processing to all attached processors
         foreach ($this->handlers as $handler) {
             $response = $handler->handle($message, $recipients);
             # send for processing
@@ -130,6 +131,6 @@ abstract class AbstractChannel implements ChannelInterface
                 break;
             }
         }
-        return $response ?: $this->propagate();
+        return !is_bool($response) || !$response ? $response : $this->propagate();
     }
 }

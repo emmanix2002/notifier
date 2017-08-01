@@ -8,7 +8,6 @@ use Emmanix2002\Notifier\Channel\Channel;
 use Emmanix2002\Notifier\Channel\ChannelInterface;
 use Emmanix2002\Notifier\Message\MessageInterface;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
-use Monolog\Handler\ChromePHPHandler;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -86,11 +85,11 @@ class Notifier
      * @param RecipientCollection $recipients
      * @param \string[]           ...$channelNames
      *
-     * @return mixed
+     * @return array
      * @throws \InvalidArgumentException
      * @throws \UnderflowException
      */
-    final public function notify(MessageInterface $message, RecipientCollection $recipients, string ...$channelNames)
+    final public function notify(MessageInterface $message, RecipientCollection $recipients, string ...$channelNames): array
     {
         if (empty($this->channels)) {
             throw new \UnderflowException('There are no channels configured');
@@ -99,19 +98,21 @@ class Notifier
             throw new \InvalidArgumentException('You need to specify at least one channel to send the message through');
         }
         list($message, $recipients) = $this->process($message, $recipients);
-        $response = null;
+        # send data for processing through all attached processors
+        $responses = [];
+        # channel responses
         foreach ($this->channels as $channel) {
             if (!in_array($channel->getName(), $channelNames, true)) {
                 continue;
             }
-            $response = $channel->notify($message, $recipients);
+            $responses[$channel->getName()] = $channel->notify($message, $recipients);
             # we collect the response
-            if (!is_bool($response) || !$response) {
+            if (!is_bool($responses[$channel->getName()]) || !$responses[$channel->getName()]) {
                 # this channel does not support bubbling
                 break;
             }
         }
-        return $response ?: true;
+        return $responses;
     }
     
     /**

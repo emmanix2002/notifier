@@ -5,7 +5,6 @@ namespace Emmanix2002\Notifier\Handler;
 use Emmanix2002\Notifier\Message\InfobipSmsMessage;
 use Emmanix2002\Notifier\Message\MessageInterface;
 use Emmanix2002\Notifier\Message\SmsMessage;
-use Emmanix2002\Notifier\Notifier;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
 use infobip\api\client\SendMultipleTextualSmsAdvanced;
 use infobip\api\configuration\BasicAuthConfiguration;
@@ -146,9 +145,8 @@ class InfobipSmsHandler extends AbstractHandler
                 # not going any further
                 return $response;
             }
-        } catch (\InvalidArgumentException $e) {
-            # since it failed, we pass the notification to the next handler irrespective of the choice by this handler
-            Notifier::getLogger()->error($e->getMessage());
+        } catch (\Throwable $e) {
+            $this->processException($e);
         }
         return $this->propagate();
     }

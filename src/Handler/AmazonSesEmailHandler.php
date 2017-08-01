@@ -7,7 +7,6 @@ use Aws\Ses\SesClient;
 use Emmanix2002\Notifier\Message\EmailMessage;
 use Emmanix2002\Notifier\Message\MessageInterface;
 use Emmanix2002\Notifier\Message\SesEmailMessage;
-use Emmanix2002\Notifier\Notifier;
 use Emmanix2002\Notifier\Recipient\EmailRecipient;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
 
@@ -125,11 +124,8 @@ class AmazonSesEmailHandler extends AbstractHandler
                 return count($chunkResults) === 1 ? $chunkResults[0] : $chunkResults;
             }
 
-        } catch (\InvalidArgumentException $e) {
-            # since it failed, we pass the notification to the next handler irrespective of the choice by this handler
-            Notifier::getLogger()->error($e->getMessage());
-        } catch (\Exception $e) {
-            Notifier::getLogger()->error($e->getMessage());
+        } catch (\Throwable $e) {
+            $this->processException($e);
         }
         return $this->propagate();
     }
