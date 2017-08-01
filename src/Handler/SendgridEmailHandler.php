@@ -19,17 +19,32 @@ class SendgridEmailHandler extends AbstractHandler
      * @var string
      */
     private $key;
-    
+
+    /**
+     * @var bool
+     */
+    private $stopPropagation;
+
     /**
      * SendgridEmailHandler constructor.
      *
      * @param string $key
+     * @param bool   $stopPropagation
      */
-    public function __construct(string $key)
+    public function __construct(string $key, bool $stopPropagation = true)
     {
         $this->key = (string) $key;
+        $this->stopPropagation = $stopPropagation;
     }
-    
+
+    /**
+     * @inheritdoc
+     */
+    public function propagate(): bool
+    {
+        return !$this->stopPropagation;
+    }
+
     /**
      * It performs an action on the received message; sending it to all the recipients
      *
@@ -98,14 +113,15 @@ class SendgridEmailHandler extends AbstractHandler
             }
             # compose the email
             $response = $sendGrid->client->mail()->send()->post($mail);
-            Notifier::getLogger()->debug('Response', ['data' => $response]);
+            if ($this->stopPropagation) {
+                # not going any further
+                return $response;
+            }
         } catch (\InvalidArgumentException $e) {
             # since it failed, we pass the notification to the next handler irrespective of the choice by this handler
             Notifier::getLogger()->error($e->getMessage());
-            return true;
         } catch (\Exception $e) {
             Notifier::getLogger()->error($e->getMessage());
-            return true;
         }
         return $this->propagate();
     }

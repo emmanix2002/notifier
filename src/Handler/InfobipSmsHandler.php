@@ -38,19 +38,34 @@ class InfobipSmsHandler extends AbstractHandler
      * @var string
      */
     private $from;
-    
+
+    /**
+     * @var bool
+     */
+    private $stopPropagation;
+
     /**
      * InfobipSmsHandler constructor.
      *
      * @param string $username
      * @param string $password
      * @param string $fromPhone
+     * @param bool   $stopPropagation
      */
-    public function __construct(string $username, string $password, string $fromPhone)
+    public function __construct(string $username, string $password, string $fromPhone, bool $stopPropagation = true)
     {
         $this->username = $username;
         $this->password = $password;
         $this->from = $fromPhone;
+        $this->stopPropagation = $stopPropagation;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function propagate(): bool
+    {
+        return !$this->stopPropagation;
     }
     
     /**
@@ -127,7 +142,8 @@ class InfobipSmsHandler extends AbstractHandler
                 $request->setBulkId(Uuid::uuid1()->toString());
             }
             $response = $this->getClient()->execute($request);
-            if (!$this->propagate()) {
+            if ($this->stopPropagation) {
+                # not going any further
                 return $response;
             }
         } catch (\InvalidArgumentException $e) {

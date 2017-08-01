@@ -30,7 +30,8 @@
     "squizlabs/php_codesniffer": "~2.3",
     "sendgrid/sendgrid": "~5.1",
     "infobip/infobip-api-php-client": "dev-master",
-    "ramsey/uuid": "^3.6"
+    "ramsey/uuid": "^3.6",
+    "aws/aws-sdk-php": "^3.32"
   },
   "autoload": {
     "psr-4": {
@@ -47,6 +48,7 @@
     "format": "phpcbf --standard=psr2 src/"
   },
   "suggest": {
+    "aws/aws-sdk-php": "Required for using the Amazon SES email handler for sending emails",
     "sendgrid/sendgrid": "Required for using the Sendgrid email handler",
     "infobip/infobip-api-php-client": "Required for using the Infobip SMS handler",
     "ramsey/uuid": "Useful for creating Bulk Ids when sending bulk SMS messages with the infobip handler"

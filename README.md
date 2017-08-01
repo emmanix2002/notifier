@@ -128,14 +128,16 @@ Handlers are the actual mechanism that send out the notifications; without handl
 Handlers added to a channel are stored in a stack (i.e. Last-In, First-Out - **LIFO**); meaning, the last handler added 
 to a channel gets executed first.     
 
-After a handler is called, and it completes execution, it returns a `boolean` value representing whether or not the 
-request (i.e. `Message` and `RecipientCollection`) should be passed to the next handler for processing:    
+After a handler is called, and it completes execution, it returns either a `boolean` value or any other value as 
+required, that informs the notifier whether or not the request (i.e. `Message` and `RecipientCollection`) should be 
+passed to the next handler for processing:    
 
-- `true`: the request should be forwarded to the next handler
-- `false`: the request should not be forwarded anymore (probably because the handler has completed successfully)
+- `boolean` (`true` or `false`): the request should be forwarded (`true`) to the next handler, else (`false`) it should not    
+- `mixed`: any other value besides the **boolean** (`true`) causes the notifier to stop at this handler, and return 
+this value. This is useful in scenarios where the actual response from the handler is important.     
 
 Handlers **must** define a `propagate(): bool` method on themselves to describe the propagate preference for the handler.    
-By default, all handlers that `extend` the `AbstractHandler` class **return** `false`.     
+By default, all handlers that `extend` the `AbstractHandler` class **return** `false` - meaning *they don't propagate*.         
 
 ## Usage
 See the `examples` directory for more.
