@@ -7,11 +7,11 @@ use Emmanix2002\Notifier\Recipient\RecipientCollection;
 use Emmanix2002\Notifier\Recipient\SendgridEmailRecipient;
 
 $baseDir = dirname(__DIR__);
-require_once($baseDir.'/vendor/autoload.php');
+require_once $baseDir.'/vendor/autoload.php';
 
 Notifier::loadEnv();
 $notifier = new Notifier('sendgrid', [
-    new SendgridEmailHandler(getenv('SENDGRID_KEY'))
+    new SendgridEmailHandler(getenv('SENDGRID_KEY')),
 ]);
 dump($notifier);
 $message = new SendgridEmailMessage(

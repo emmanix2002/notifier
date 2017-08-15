@@ -16,9 +16,8 @@ use Ramsey\Uuid\Uuid;
 /**
  * This handler uses the Infobip infrastructure to send SMS messages to the destination phone numbers.
  * Numbers are expected to be in the international format i.e. with the country code present
- * For a Nigerian number: 08123456789, the destination would be: 2348123456789
+ * For a Nigerian number: 08123456789, the destination would be: 2348123456789.
  *
- * @package Emmanix2002\Notifier\Handler
  * @link https://dev.infobip.com/docs/fully-featured-textual-message
  */
 class InfobipSmsHandler extends AbstractHandler
@@ -27,12 +26,12 @@ class InfobipSmsHandler extends AbstractHandler
      * @var string
      */
     private $username;
-    
+
     /**
      * @var string
      */
     private $password;
-    
+
     /**
      * @var string
      */
@@ -60,15 +59,15 @@ class InfobipSmsHandler extends AbstractHandler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function propagate(): bool
     {
         return !$this->stopPropagation;
     }
-    
+
     /**
-     * The phone number it is from
+     * The phone number it is from.
      *
      * @param string $phoneNumber
      *
@@ -77,11 +76,12 @@ class InfobipSmsHandler extends AbstractHandler
     public function setFrom(string $phoneNumber)
     {
         $this->from = $phoneNumber;
+
         return $this;
     }
-    
+
     /**
-     * Returns the authentication configuration object
+     * Returns the authentication configuration object.
      *
      * @return BasicAuthConfiguration
      */
@@ -89,9 +89,9 @@ class InfobipSmsHandler extends AbstractHandler
     {
         return new BasicAuthConfiguration($this->username, $this->password);
     }
-    
+
     /**
-     * Returns the SMS client to be used
+     * Returns the SMS client to be used.
      *
      * @return SendMultipleTextualSmsAdvanced
      */
@@ -99,15 +99,16 @@ class InfobipSmsHandler extends AbstractHandler
     {
         return new SendMultipleTextualSmsAdvanced($this->getAuthConfig());
     }
-    
+
     /**
-     * It performs an action on the received message; sending it to all the recipients
+     * It performs an action on the received message; sending it to all the recipients.
      *
      * @param MessageInterface    $message
      * @param RecipientCollection $recipients
      *
-     * @return mixed
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
     public function handle(MessageInterface $message, RecipientCollection $recipients)
     {
@@ -142,12 +143,13 @@ class InfobipSmsHandler extends AbstractHandler
             }
             $response = $this->getClient()->execute($request);
             if ($this->stopPropagation) {
-                # not going any further
+                // not going any further
                 return $response;
             }
         } catch (\Throwable $e) {
             $this->processException($e);
         }
+
         return $this->propagate();
     }
 }

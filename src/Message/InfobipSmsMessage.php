@@ -4,28 +4,27 @@ namespace Emmanix2002\Notifier\Message;
 
 class InfobipSmsMessage extends SmsMessage
 {
-    
     const NOTIFY_CONTENT_TYPE_JSON = 'application/json';
-    
+
     const NOTIFY_CONTENT_TYPE_XML = 'application/xml';
-    
+
     /**
-     * What time to schedule the message for
+     * What time to schedule the message for.
      *
      * @var \DateTime|null
      */
     protected $scheduledFor;
-    
+
     /**
      * @var string
      */
     protected $notifyUrl;
-    
+
     /**
      * @var string
      */
     protected $notifyContentType;
-    
+
     /**
      * InfobipSmsMessage constructor.
      *
@@ -37,9 +36,9 @@ class InfobipSmsMessage extends SmsMessage
         parent::__construct($message);
         $this->scheduledFor = $scheduleFor;
     }
-    
+
     /**
-     * Schedule the message for a set time
+     * Schedule the message for a set time.
      *
      * @param \DateTime $dateTime
      *
@@ -50,9 +49,10 @@ class InfobipSmsMessage extends SmsMessage
         if (new \DateTime() <= $dateTime) {
             $this->scheduledFor = $dateTime;
         }
+
         return $this;
     }
-    
+
     /**
      * @return \DateTime|null
      */
@@ -60,12 +60,12 @@ class InfobipSmsMessage extends SmsMessage
     {
         return $this->scheduledFor;
     }
-    
+
     /**
-     * Set the notification URL where delivery reports should be delivered to
+     * Set the notification URL where delivery reports should be delivered to.
      *
      * @param string $notifyUrl
-     * @param string $contentType   the format of data to be sent to the URL
+     * @param string $contentType the format of data to be sent to the URL
      *
      * @return $this
      */
@@ -75,9 +75,10 @@ class InfobipSmsMessage extends SmsMessage
         $types = [self::NOTIFY_CONTENT_TYPE_JSON, self::NOTIFY_CONTENT_TYPE_XML];
         $contentType = !in_array($contentType, $types, true) ? self::NOTIFY_CONTENT_TYPE_JSON : $contentType;
         $this->notifyContentType = $contentType;
+
         return $this;
     }
-    
+
     /**
      * @return string
      */
@@ -85,7 +86,7 @@ class InfobipSmsMessage extends SmsMessage
     {
         return (string) $this->notifyUrl;
     }
-    
+
     /**
      * @return string
      */

@@ -7,7 +7,7 @@ use Emmanix2002\Notifier\Channel\ChannelInterface;
 trait ManagesChannels
 {
     /**
-     * Add a new notifier channel
+     * Add a new notifier channel.
      *
      * @param ChannelInterface $channel
      *
@@ -19,11 +19,12 @@ trait ManagesChannels
             $this->channels = [];
         }
         $this->channels[] = $channel;
+
         return $this;
     }
-    
+
     /**
-     * Replaces the channels list
+     * Replaces the channels list.
      *
      * @param ChannelInterface[] ...$channels
      *
@@ -35,17 +36,19 @@ trait ManagesChannels
         foreach ($channels as $channel) {
             $this->channels[] = $channel;
         }
+
         return $this;
     }
-    
+
     /**
-     * Removes a channel with the provided name from the channels list
+     * Removes a channel with the provided name from the channels list.
      *
      * @param string $name  the name of the channel to remove
      * @param int    $count the maximum number of channels to remove
      *
-     * @return $this
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function removeChannel(string $name, int $count = 1)
     {
@@ -62,11 +65,12 @@ trait ManagesChannels
                 ++$removed;
             }
         }
+
         return $this;
     }
-    
+
     /**
-     * Finds a channel with the given name
+     * Finds a channel with the given name.
      *
      * @param string $name
      *
@@ -79,6 +83,5 @@ trait ManagesChannels
                 return $channel;
             }
         }
-        return null;
     }
 }

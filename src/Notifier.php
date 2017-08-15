@@ -15,34 +15,34 @@ use Psr\Log\LoggerInterface;
 class Notifier
 {
     use ManagesChannels, ManagesProcessors;
-    
+
     /**
-     * An array of channels present in this notifier instance
+     * An array of channels present in this notifier instance.
      *
      * @var ChannelInterface[]
      */
     protected $channels;
-    
+
     /**
-     * The stack of processors
+     * The stack of processors.
      *
      * @var array
      */
     protected $processors;
-    
+
     /**
      * @var LoggerInterface
      */
     private static $logger = null;
-    
+
     /**
      * @var Notifier
      */
     private static $instance;
-    
+
     /**
      * Notifier constructor.
-     * It automatically creates a new channel with the provided name, and sets the handlers on it
+     * It automatically creates a new channel with the provided name, and sets the handlers on it.
      *
      * @param string $name
      * @param array  $handlers
@@ -51,9 +51,9 @@ class Notifier
     {
         $this->addChannel(Channel::named($name, $handlers));
     }
-    
+
     /**
-     * Provides a static interface to getting the Notifier
+     * Provides a static interface to getting the Notifier.
      *
      * @param string $name
      * @param array  $handlers
@@ -65,11 +65,12 @@ class Notifier
         if (self::$instance === null) {
             self::$instance = new static($name, $handlers);
         }
+
         return self::$instance;
     }
-    
+
     /**
-     * Gets the current channel list
+     * Gets the current channel list.
      *
      * @return ChannelInterface[]
      */
@@ -77,17 +78,18 @@ class Notifier
     {
         return $this->channels;
     }
-    
+
     /**
-     * Sends the notification
+     * Sends the notification.
      *
      * @param MessageInterface    $message
      * @param RecipientCollection $recipients
      * @param \string[]           ...$channelNames
      *
-     * @return array
      * @throws \InvalidArgumentException
      * @throws \UnderflowException
+     *
+     * @return array
      */
     final public function notify(MessageInterface $message, RecipientCollection $recipients, string ...$channelNames): array
     {
@@ -98,23 +100,24 @@ class Notifier
             throw new \InvalidArgumentException('You need to specify at least one channel to send the message through');
         }
         list($message, $recipients) = $this->process($message, $recipients);
-        # send data for processing through all attached processors
+        // send data for processing through all attached processors
         $responses = [];
-        # channel responses
+        // channel responses
         foreach ($this->channels as $channel) {
             if (!in_array($channel->getName(), $channelNames, true)) {
                 continue;
             }
             $responses[$channel->getName()] = $channel->notify($message, $recipients);
-            # we collect the response
+            // we collect the response
             if (!is_bool($responses[$channel->getName()]) || !$responses[$channel->getName()]) {
-                # this channel does not support bubbling
+                // this channel does not support bubbling
                 break;
             }
         }
+
         return $responses;
     }
-    
+
     /**
      * Loads the environment variables.
      * If this library was not installed using composer, it loads settings from the library's root directory, else
@@ -125,16 +128,16 @@ class Notifier
         try {
             $vendorDir = dirname(__DIR__, 3);
             $loadDir = substr($vendorDir, -6) === 'vendor' ? dirname($vendorDir) : dirname(__DIR__);
-            # if the /vendor path doesn't exist in the variable, use the current directory, else use the project dir
+            // if the /vendor path doesn't exist in the variable, use the current directory, else use the project dir
             $dotEnv = new Dotenv($loadDir);
             $dotEnv->load();
         } catch (InvalidPathException $e) {
             self::getLogger()->error($e->getMessage());
         }
     }
-    
+
     /**
-     * Returns the logger
+     * Returns the logger.
      *
      * @return LoggerInterface
      */
@@ -144,6 +147,7 @@ class Notifier
             self::$logger = new Logger(__CLASS__);
             self::$logger->pushHandler(new ErrorLogHandler(ErrorLogHandler::OPERATING_SYSTEM, Logger::WARNING));
         }
+
         return self::$logger;
     }
 }

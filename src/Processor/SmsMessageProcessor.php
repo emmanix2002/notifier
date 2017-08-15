@@ -6,9 +6,7 @@ use Emmanix2002\Notifier\Message\MessageInterface;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
 
 /**
- * This processor basically forces the message to have a maximum of 140 characters
- *
- * @package Emmanix2002\Notifier\Processor
+ * This processor basically forces the message to have a maximum of 140 characters.
  */
 class SmsMessageProcessor
 {
@@ -18,6 +16,7 @@ class SmsMessageProcessor
         if ($messageLength > 140) {
             $message->setMessage(substr($message->getMessage(), 0, 137).'...');
         }
+
         return [$message, $recipients];
     }
 }

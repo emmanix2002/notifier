@@ -8,7 +8,7 @@ class SendgridEmailRecipient extends EmailRecipient
      * @var array
      */
     protected $substitutions;
-    
+
     /**
      * SendgridEmailRecipient constructor.
      *
@@ -24,9 +24,9 @@ class SendgridEmailRecipient extends EmailRecipient
         parent::__construct($email, $cc, $bcc);
         $this->substitutions = (array) $substitutions;
     }
-    
+
     /**
-     * Sets the substitutions for this recipient
+     * Sets the substitutions for this recipient.
      *
      * @param array $substitutions
      *
@@ -35,11 +35,12 @@ class SendgridEmailRecipient extends EmailRecipient
     public function setSubstitutions(array $substitutions)
     {
         $this->substitutions = (array) $substitutions;
+
         return $this;
     }
-    
+
     /**
-     * Adds a new substitution key
+     * Adds a new substitution key.
      *
      * @param string $key
      * @param        $value
@@ -53,9 +54,10 @@ class SendgridEmailRecipient extends EmailRecipient
             return $this;
         }
         $this->substitutions[$key] = $value;
+
         return $this;
     }
-    
+
     /**
      * @return array
      */

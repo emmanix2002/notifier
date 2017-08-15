@@ -11,18 +11,18 @@ class SendgridEmailRecipientTest extends TestCase
      * @var SendgridEmailRecipient
      */
     private $recipient;
-    
+
     public function setup()
     {
         $this->recipient = new SendgridEmailRecipient('id@example.com');
     }
-    
+
     public function testSetSubstitutions()
     {
         $this->recipient->setSubstitutions(['field' => 'value', 'field1' => 'value1']);
         $this->assertNotEmpty($this->recipient->getSubstitutions());
     }
-    
+
     public function testAddSubstitution()
     {
         $this->recipient->addSubstitution('field2', 'value2', true);

@@ -2,7 +2,6 @@
 
 namespace Emmanix2002\Notifier\Handler;
 
-
 use Aws\Ses\SesClient;
 use Emmanix2002\Notifier\Message\EmailMessage;
 use Emmanix2002\Notifier\Message\MessageInterface;
@@ -35,7 +34,7 @@ class AmazonSesEmailHandler extends AbstractHandler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function propagate(): bool
     {
@@ -43,7 +42,7 @@ class AmazonSesEmailHandler extends AbstractHandler
     }
 
     /**
-     * Sets the SesClient to use with the handler
+     * Sets the SesClient to use with the handler.
      *
      * @param SesClient $client
      *
@@ -52,16 +51,17 @@ class AmazonSesEmailHandler extends AbstractHandler
     public function setClient(SesClient $client)
     {
         $this->sesClient = $client;
+
         return $this;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function handle(MessageInterface $message, RecipientCollection $recipients)
     {
         $chunkResults = [];
-        # our email results
+        // our email results
         try {
             if (!$message instanceof EmailMessage) {
                 throw new \InvalidArgumentException('The message need to be an instance of EmailMessage');
@@ -75,27 +75,27 @@ class AmazonSesEmailHandler extends AbstractHandler
             if (empty($message->getBody())) {
                 throw new \UnexpectedValueException('You have not added the message to be sent.');
             }
-            $message = ! $message instanceof SesEmailMessage ? SesEmailMessage::instance($message) : $message;
-            # convert the message to an SesEmailMessage object
+            $message = !$message instanceof SesEmailMessage ? SesEmailMessage::instance($message) : $message;
+            // convert the message to an SesEmailMessage object
             $recipientsAsArray = $recipients->getArrayCopy();
-            # we get a copy of the array
+            // we get a copy of the array
             $chunks = array_chunk($recipientsAsArray, 50);
-            # we break up everything into chunks of 50
+            // we break up everything into chunks of 50
             foreach ($chunks as $chunk) {
-                # process them one chunk at a time
+                // process them one chunk at a time
                 $messageBody = [
-                    'Text' => ['Data' => $message->toPlainText(), 'Charset' => 'utf-8']
+                    'Text' => ['Data' => $message->toPlainText(), 'Charset' => 'utf-8'],
                 ];
                 if (!$message->isPlain()) {
-                    # not a plain text only message
+                    // not a plain text only message
                     $messageBody['Html'] = ['Data' => $message->getBody(), 'Charset' => 'utf-8'];
                 }
                 $addresses = ['To' => [], 'Cc' => [], 'Bcc' => []];
-                # our address container
+                // our address container
                 $destinations = new RecipientCollection($chunk, $recipients->getRecipientClass());
-                # we create the destinations
+                // we create the destinations
                 foreach ($destinations as $recipient) {
-                    if (! $recipient instanceof EmailRecipient) {
+                    if (!$recipient instanceof EmailRecipient) {
                         continue;
                     }
                     $addresses['To'][] = $recipient->getAddress();
@@ -107,26 +107,26 @@ class AmazonSesEmailHandler extends AbstractHandler
                     }
                 }
                 $chunkResults[] = $this->sesClient->sendEmail([
-                    'Source' => $message->getFrom(),
+                    'Source'      => $message->getFrom(),
                     'Destination' => [
-                        'ToAddresses' => $addresses['To'],
-                        'CcAddresses' => $addresses['Cc'],
+                        'ToAddresses'  => $addresses['To'],
+                        'CcAddresses'  => $addresses['Cc'],
                         'BccAddresses' => $addresses['Bcc'],
                     ],
                     'Message' => [
                         'Subject' => ['Data' => $message->getSubject()],
-                        'Body' => $messageBody
-                    ]
+                        'Body'    => $messageBody,
+                    ],
                 ]);
             }
             if ($this->stopPropagation) {
-                # not going any further
+                // not going any further
                 return count($chunkResults) === 1 ? $chunkResults[0] : $chunkResults;
             }
-
         } catch (\Throwable $e) {
             $this->processException($e);
         }
+
         return $this->propagate();
     }
 }

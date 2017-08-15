@@ -2,20 +2,20 @@
 
 namespace Emmanix2002\Notifier\Recipient;
 
-
 class RecipientCollection extends \ArrayIterator
 {
     /**
-     * An array of addresses to be used in instantiating the individual recipient objects
+     * An array of addresses to be used in instantiating the individual recipient objects.
+     *
      * @var array
      */
     protected $addresses;
-    
+
     /**
      * @var string
      */
     protected $recipientClass;
-    
+
     /**
      * RecipientCollection constructor.
      *
@@ -34,14 +34,15 @@ class RecipientCollection extends \ArrayIterator
         $this->addresses = $addresses;
         $this->recipientClass = $recipientClass;
     }
-    
+
     /**
-     * Checks that the recipient class is an instance of RecipientInterface
+     * Checks that the recipient class is an instance of RecipientInterface.
      *
      * @param string $className
      *
-     * @return bool
      * @throws \RuntimeException
+     *
+     * @return bool
      */
     private function checkClass(string $className)
     {
@@ -56,11 +57,12 @@ class RecipientCollection extends \ArrayIterator
         } catch (\ReflectionException $e) {
             throw new \RuntimeException('Could not reflect on the recipient class provided');
         }
+
         return false;
     }
-    
+
     /**
-     * Returns the class container for the addresses
+     * Returns the class container for the addresses.
      *
      * @return string
      */
@@ -68,21 +70,22 @@ class RecipientCollection extends \ArrayIterator
     {
         return $this->recipientClass;
     }
-    
+
     /**
-     * Create a new collection instance
+     * Create a new collection instance.
      *
      * @param array $addresses
      * @param       $recipientClass
      *
-     * @return static
      * @throws \InvalidArgumentException
+     *
+     * @return static
      */
-    public static function make(array $addresses = [], string $recipientClass)
+    public static function make(array $addresses, string $recipientClass)
     {
         return new static($addresses, $recipientClass);
     }
-    
+
     /**
      * Get all of the items in the collection.
      *
@@ -92,7 +95,7 @@ class RecipientCollection extends \ArrayIterator
     {
         return $this->addresses;
     }
-    
+
     /**
      * @return RecipientInterface
      */
@@ -105,9 +108,10 @@ class RecipientCollection extends \ArrayIterator
         if (is_array($recipient)) {
             return new $this->recipientClass(...$recipient);
         }
+
         return new $this->recipientClass($recipient);
     }
-    
+
     /**
      * @param string $index
      *
@@ -122,6 +126,7 @@ class RecipientCollection extends \ArrayIterator
         if (is_array($recipient)) {
             return new $this->recipientClass(...$recipient);
         }
+
         return new $this->recipientClass($recipient);
     }
 }

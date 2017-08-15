@@ -8,25 +8,25 @@ class SendgridEmailMessage extends EmailMessage
      * @var array
      */
     private $sections;
-    
+
     /**
      * @var string
      */
     private $category;
-    
+
     /**
      * @var bool
      */
     private $usesTemplate;
-    
+
     /**
      * SendgridEmailMessage constructor.
      *
-     * @param string|null $from         the sender email address
-     * @param string|null $subject      the email subject
-     * @param string|null $body         the plain text email message
-     * @param string|null $replyTo      the replyTo email address (default: $from)
-     * @param array       $sections     associative array of sections to be used for substitutions in a template
+     * @param string|null $from     the sender email address
+     * @param string|null $subject  the email subject
+     * @param string|null $body     the plain text email message
+     * @param string|null $replyTo  the replyTo email address (default: $from)
+     * @param array       $sections associative array of sections to be used for substitutions in a template
      */
     public function __construct(
             string $from = null,
@@ -39,9 +39,9 @@ class SendgridEmailMessage extends EmailMessage
         $this->sections = $sections;
         $this->usesTemplate = false;
     }
-    
+
     /**
-     * Sets the template id on the message as the body
+     * Sets the template id on the message as the body.
      *
      * @param string $templateId
      *
@@ -51,11 +51,12 @@ class SendgridEmailMessage extends EmailMessage
     {
         $this->body = $templateId;
         $this->usesTemplate = true;
+
         return $this;
     }
-    
+
     /**
-     * Sets the message category/tag
+     * Sets the message category/tag.
      *
      * @param string $category
      *
@@ -64,11 +65,12 @@ class SendgridEmailMessage extends EmailMessage
     public function setCategory(string $category)
     {
         $this->category = $category;
+
         return $this;
     }
-    
+
     /**
-     * Sets the section array
+     * Sets the section array.
      *
      * @param array $sections
      *
@@ -77,11 +79,12 @@ class SendgridEmailMessage extends EmailMessage
     public function setSections(array $sections)
     {
         $this->sections = $sections;
+
         return $this;
     }
-    
+
     /**
-     * Adds a new section entry
+     * Adds a new section entry.
      *
      * @param string $key
      * @param        $value
@@ -91,9 +94,10 @@ class SendgridEmailMessage extends EmailMessage
     public function addSectionData(string $key, $value)
     {
         $this->sections[$key] = $value;
+
         return $this;
     }
-    
+
     /**
      * @return string
      */
@@ -101,7 +105,7 @@ class SendgridEmailMessage extends EmailMessage
     {
         return (string) $this->category;
     }
-    
+
     /**
      * @return array
      */
@@ -109,7 +113,7 @@ class SendgridEmailMessage extends EmailMessage
     {
         return $this->sections;
     }
-    
+
     /**
      * @return bool
      */

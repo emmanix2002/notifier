@@ -37,7 +37,7 @@ class SendgridEmailHandler extends AbstractHandler
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function propagate(): bool
     {
@@ -45,13 +45,14 @@ class SendgridEmailHandler extends AbstractHandler
     }
 
     /**
-     * It performs an action on the received message; sending it to all the recipients
+     * It performs an action on the received message; sending it to all the recipients.
      *
      * @param MessageInterface    $message
      * @param RecipientCollection $recipients
      *
-     * @return bool
      * @throws \InvalidArgumentException
+     *
+     * @return bool
      */
     public function handle(MessageInterface $message, RecipientCollection $recipients): bool
     {
@@ -64,22 +65,22 @@ class SendgridEmailHandler extends AbstractHandler
             $mail->setFrom(new Email($message->getFromName() ?: null, $message->getFrom()));
             $mail->setSubject($message->getSubject());
             $mail->setReplyTo(new Email(null, $message->getReplyTo() ?: $message->getFrom()));
-            # set some general properties on the mail
+            // set some general properties on the mail
             $contentType = $message->isPlain() ? 'text/plain' : 'text/html';
             $content = new Content($contentType, $message->getBody());
-            # create the content
+            // create the content
             $personalizationTemplate = new Personalization();
-            # we create the template object
+            // we create the template object
             foreach ($recipients as $id => $recipient) {
-                # we process substitutions for all the recipients
+                // we process substitutions for all the recipients
                 $personalization = clone $personalizationTemplate;
-                # clone the shit
+                // clone the shit
                 $personalization->addTo(new Email(null, $recipient->getAddress()));
-                # add the address
+                // add the address
                 if ($recipient instanceof SendgridEmailRecipient && !empty($recipient->getSubstitutions())) {
                     foreach ($recipient->getSubstitutions() as $key => $value) {
                         $personalization->addSubstitution($key, $value);
-                        # add recipient's substitutions
+                        // add recipient's substitutions
                     }
                 }
                 if (!empty($recipient->getCc())) {
@@ -93,7 +94,7 @@ class SendgridEmailHandler extends AbstractHandler
                     }
                 }
                 $mail->addPersonalization($personalization);
-                # add the personalisation
+                // add the personalisation
             }
             if ($message instanceof SendgridEmailMessage) {
                 if ($message->usesTemplate()) {
@@ -110,15 +111,16 @@ class SendgridEmailHandler extends AbstractHandler
                     }
                 }
             }
-            # compose the email
+            // compose the email
             $response = $sendGrid->client->mail()->send()->post($mail);
             if ($this->stopPropagation) {
-                # not going any further
+                // not going any further
                 return $response;
             }
         } catch (\Throwable $e) {
             $this->processException($e);
         }
+
         return $this->propagate();
     }
 }

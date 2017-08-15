@@ -2,14 +2,13 @@
 
 namespace Emmanix2002\Notifier;
 
-
 use Emmanix2002\Notifier\Message\MessageInterface;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
 
 trait ManagesProcessors
 {
     /**
-     * Pushes a new processor onto the stack
+     * Pushes a new processor onto the stack.
      *
      * @param callable $processor
      *
@@ -21,25 +20,28 @@ trait ManagesProcessors
             $this->processors = [];
         }
         array_unshift($this->processors, $processor);
+
         return $this;
     }
-    
+
     /**
-     * Pops the top-most processor in the stack
+     * Pops the top-most processor in the stack.
+     *
+     * @throws \UnderflowException
      *
      * @return callable
-     * @throws \UnderflowException
      */
     public function popProcessor(): callable
     {
         if (empty($this->processors)) {
             throw new \UnderflowException('You have not added any processors yet!');
         }
+
         return array_shift($this->processors);
     }
-    
+
     /**
-     * Returns the current stack of processors
+     * Returns the current stack of processors.
      *
      * @return callable[]
      */
@@ -47,9 +49,9 @@ trait ManagesProcessors
     {
         return $this->processors ?: [];
     }
-    
+
     /**
-     * Passes the message and recipients through all the available processors
+     * Passes the message and recipients through all the available processors.
      *
      * @param MessageInterface    $message
      * @param RecipientCollection $recipients
@@ -64,6 +66,7 @@ trait ManagesProcessors
         foreach ($this->processors as $processor) {
             list($message, $recipients) = call_user_func($processor, $message, $recipients);
         }
+
         return [$message, $recipients];
     }
 }
