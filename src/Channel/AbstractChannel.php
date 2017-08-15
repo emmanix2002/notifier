@@ -10,26 +10,26 @@ use Emmanix2002\Notifier\Recipient\RecipientCollection;
 abstract class AbstractChannel implements ChannelInterface
 {
     use ManagesProcessors;
-    
+
     /**
-     * The channel name
+     * The channel name.
      *
      * @var string
      */
     protected $name;
-    
+
     /**
-     * The stack of handlers
+     * The stack of handlers.
      *
      * @var HandlerInterface[]
      */
     protected $handlers;
-    
+
     /**
      * @var callable[]
      */
     protected $processors;
-    
+
     /**
      * AbstractChannel constructor.
      *
@@ -43,9 +43,9 @@ abstract class AbstractChannel implements ChannelInterface
             $this->setHandlers(...$handlers);
         }
     }
-    
+
     /**
-     * Get the current handler stack
+     * Get the current handler stack.
      *
      * @return HandlerInterface[]
      */
@@ -53,9 +53,9 @@ abstract class AbstractChannel implements ChannelInterface
     {
         return $this->handlers ?: [];
     }
-    
+
     /**
-     * Adds a handler to the stack
+     * Adds a handler to the stack.
      *
      * @param HandlerInterface $handler
      *
@@ -67,25 +67,28 @@ abstract class AbstractChannel implements ChannelInterface
             $this->handlers = [];
         }
         array_unshift($this->handlers, $handler);
+
         return $this;
     }
-    
+
     /**
-     * Pops the top-most handler in the stack
+     * Pops the top-most handler in the stack.
+     *
+     * @throws \UnderflowException
      *
      * @return HandlerInterface|mixed
-     * @throws \UnderflowException
      */
     public function popHandler(): HandlerInterface
     {
         if (empty($this->handlers)) {
             throw new \UnderflowException('You have not added any handlers to the channel yet!');
         }
+
         return array_shift($this->handlers);
     }
-    
+
     /**
-     * Replaces the current set of handlers with a new set
+     * Replaces the current set of handlers with a new set.
      *
      * @param HandlerInterface[] ...$handlers
      *
@@ -98,11 +101,12 @@ abstract class AbstractChannel implements ChannelInterface
         foreach ($handlers as $handler) {
             $this->pushHandler($handler);
         }
+
         return $this;
     }
-    
+
     /**
-     * The name of the channel
+     * The name of the channel.
      *
      * @return string
      */
@@ -110,27 +114,28 @@ abstract class AbstractChannel implements ChannelInterface
     {
         return $this->name;
     }
-    
+
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function notify(MessageInterface $message, RecipientCollection $recipients)
     {
         if (empty($this->handlers)) {
-            # no handler here -- so we just bubble to the next channel
+            // no handler here -- so we just bubble to the next channel
             return true;
         }
         $response = null;
         list($message, $recipients) = $this->process($message, $recipients);
-        # send for processing to all attached processors
+        // send for processing to all attached processors
         foreach ($this->handlers as $handler) {
             $response = $handler->handle($message, $recipients);
-            # send for processing
+            // send for processing
             if (!is_bool($response) || !$response) {
-                # stop propagation
+                // stop propagation
                 break;
             }
         }
+
         return !is_bool($response) || !$response ? $response : $this->propagate();
     }
 }

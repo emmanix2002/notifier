@@ -12,18 +12,18 @@ class RecipientCollectionTest extends TestCase
      * @var RecipientCollection
      */
     private $collection;
-    
+
     public function setup()
     {
         $phones = range(1, 20);
         $this->collection = new RecipientCollection($phones, PhoneRecipient::class);
     }
-    
+
     public function testNotEmpty()
     {
         $this->assertNotEmpty($this->collection);
     }
-    
+
     public function testIterator()
     {
         $looped = 0;

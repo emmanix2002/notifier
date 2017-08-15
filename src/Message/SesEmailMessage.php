@@ -2,11 +2,10 @@
 
 namespace Emmanix2002\Notifier\Message;
 
-
 class SesEmailMessage extends EmailMessage
 {
     /**
-     * Returns an instance of SesEmailMessage from the provided EmailMessage instance
+     * Returns an instance of SesEmailMessage from the provided EmailMessage instance.
      *
      * @param EmailMessage|null $instance
      *
@@ -18,6 +17,7 @@ class SesEmailMessage extends EmailMessage
             return new static();
         }
         $new = new static($instance->getFrom(), $instance->getSubject(), null, $instance->getReplyTo());
+
         return $new->setHtml($instance->getBody());
     }
 
@@ -30,6 +30,7 @@ class SesEmailMessage extends EmailMessage
     {
         $stripped = strip_tags($this->getBody(), '<br>');
         $patterns = ['/<br[\s]*\/>/i'];
+
         return preg_replace($patterns, PHP_EOL, $stripped);
     }
 }

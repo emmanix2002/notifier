@@ -12,38 +12,38 @@ use PHPUnit\Framework\TestCase;
 class NotifierTest extends TestCase
 {
     const DEFAULT_CHANNEL = 'named_channel';
-    
+
     /**
      * @var Notifier
      */
     private $notifier;
-    
+
     public function setup()
     {
         $this->notifier = new Notifier(self::DEFAULT_CHANNEL, [
-            new InfobipSmsHandler('username', 'password', '2348123456789')
+            new InfobipSmsHandler('username', 'password', '2348123456789'),
         ]);
         $this->notifier->pushProcessor(new SmsMessageProcessor());
     }
-    
+
     public function testGetChannel()
     {
         $channel = $this->notifier->getChannel(self::DEFAULT_CHANNEL);
         $this->assertInstanceOf(ChannelInterface::class, $channel);
     }
-    
+
     public function testGetChannels()
     {
         $this->assertNotEmpty($this->notifier->getChannels());
     }
-    
+
     public function testAddChannel()
     {
         $channel = Channel::named('removed');
         $this->notifier->addChannel($channel);
         $this->assertCount(2, $this->notifier->getChannels());
     }
-    
+
     /**
      * @depends testAddChannel
      */
@@ -52,18 +52,18 @@ class NotifierTest extends TestCase
         $this->notifier->removeChannel('removed');
         $this->assertCount(1, $this->notifier->getChannels());
     }
-    
+
     public function testGetProcessors()
     {
         $this->assertNotEmpty($this->notifier->getProcessors());
     }
-    
+
     public function testPushProcessor()
     {
         $this->notifier->pushProcessor(new SmsMessageProcessor());
         $this->assertCount(2, $this->notifier->getProcessors());
     }
-    
+
     /**
      * @depends testPushProcessor
      */

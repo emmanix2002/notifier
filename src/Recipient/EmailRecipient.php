@@ -8,17 +8,17 @@ class EmailRecipient implements RecipientInterface
      * @var string
      */
     protected $email;
-    
+
     /**
      * @var array
      */
     protected $cc = [];
-    
+
     /**
      * @var array
      */
     protected $bcc = [];
-    
+
     /**
      * EmailRecipient constructor.
      *
@@ -37,9 +37,9 @@ class EmailRecipient implements RecipientInterface
         $this->setCc($cc)
              ->setBcc($bcc);
     }
-    
+
     /**
-     * Adds an address to the CC list
+     * Adds an address to the CC list.
      *
      * @param string $email
      *
@@ -51,11 +51,12 @@ class EmailRecipient implements RecipientInterface
             return $this;
         }
         $this->cc[] = $email;
+
         return $this;
     }
-    
+
     /**
-     * Adds an email to the BCC list
+     * Adds an email to the BCC list.
      *
      * @param string $email
      *
@@ -67,11 +68,12 @@ class EmailRecipient implements RecipientInterface
             return $this;
         }
         $this->bcc[] = $email;
+
         return $this;
     }
-    
+
     /**
-     * Sets the CC addresses
+     * Sets the CC addresses.
      *
      * @param array $emails
      *
@@ -82,13 +84,14 @@ class EmailRecipient implements RecipientInterface
         if (empty($emails)) {
             return $this;
         }
-        $filtered = array_filter($emails, [EmailRecipient::class, 'validateAddress']);
+        $filtered = array_filter($emails, [self::class, 'validateAddress']);
         $this->cc = $filtered;
+
         return $this;
     }
-    
+
     /**
-     * Sets the BCC copy addresses
+     * Sets the BCC copy addresses.
      *
      * @param array $emails
      *
@@ -99,13 +102,14 @@ class EmailRecipient implements RecipientInterface
         if (empty($emails)) {
             return $this;
         }
-        $filtered = array_filter($emails, [EmailRecipient::class, 'validateAddress']);
+        $filtered = array_filter($emails, [self::class, 'validateAddress']);
         $this->bcc = $filtered;
+
         return $this;
     }
-    
+
     /**
-     * Returns the BCC addresses
+     * Returns the BCC addresses.
      *
      * @return array
      */
@@ -113,9 +117,9 @@ class EmailRecipient implements RecipientInterface
     {
         return (array) $this->bcc;
     }
-    
+
     /**
-     * Returns the CC addresses
+     * Returns the CC addresses.
      *
      * @return array
      */
@@ -123,11 +127,11 @@ class EmailRecipient implements RecipientInterface
     {
         return (array) $this->cc;
     }
-    
+
     /**
      * This returns the address for this recipient. This address can be anything:
      * email, phone number, array -- all that matters is that it can be used to identify a destination
-     * for the handler
+     * for the handler.
      *
      * @return string
      */
@@ -135,9 +139,9 @@ class EmailRecipient implements RecipientInterface
     {
         return (string) $this->email;
     }
-    
+
     /**
-     * Validates an email address
+     * Validates an email address.
      *
      * @param string $email
      *

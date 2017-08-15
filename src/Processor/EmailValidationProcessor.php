@@ -17,6 +17,7 @@ class EmailValidationProcessor
             }
             $validRecipients[] = $validated;
         }
+
         return [$message, new RecipientCollection($validRecipients, $recipients->getRecipientClass())];
     }
 }

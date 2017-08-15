@@ -10,39 +10,39 @@ class EmailMessage implements MessageInterface
      * @var string
      */
     protected $subject;
-    
+
     /**
      * @var string
      */
     protected $body;
-    
+
     /**
      * @var string
      */
     protected $from;
-    
+
     /**
      * @var string
      */
     protected $fromName;
-    
+
     /**
      * @var string|null
      */
     protected $replyTo;
-    
+
     /**
      * @var bool
      */
     protected $isPlain;
-    
+
     /**
      * EmailMessage constructor.
      *
-     * @param string|null $from     the sender email address
-     * @param string|null $subject  the email subject
-     * @param string|null $body     the plain text email message
-     * @param string|null $replyTo  the replyTo email address (default: $from)
+     * @param string|null $from    the sender email address
+     * @param string|null $subject the email subject
+     * @param string|null $body    the plain text email message
+     * @param string|null $replyTo the replyTo email address (default: $from)
      */
     public function __construct(string $from = null, string $subject = null, string $body = null, string $replyTo = null)
     {
@@ -54,14 +54,15 @@ class EmailMessage implements MessageInterface
         $this->replyTo = !empty($replyTo) ? (string) $replyTo : $this->from;
         $this->isPlain = true;
     }
-    
+
     /**
-     * Sets the FROM address
+     * Sets the FROM address.
      *
      * @param string $from
      *
-     * @return $this
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function setFrom(string $from)
     {
@@ -69,11 +70,12 @@ class EmailMessage implements MessageInterface
             throw new \InvalidArgumentException('An invalid from address was provided');
         }
         $this->from = $from;
+
         return $this;
     }
-    
+
     /**
-     * Sets the from name
+     * Sets the from name.
      *
      * @param string $fromName
      *
@@ -82,16 +84,18 @@ class EmailMessage implements MessageInterface
     public function setFromName(string $fromName)
     {
         $this->fromName = (string) $fromName;
+
         return $this;
     }
-    
+
     /**
-     * Sets the Reply-To address
+     * Sets the Reply-To address.
      *
      * @param string $replyTo
      *
-     * @return $this
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function setReplyTo(string $replyTo)
     {
@@ -99,11 +103,12 @@ class EmailMessage implements MessageInterface
             throw new \InvalidArgumentException('An invalid replyTo address was provided');
         }
         $this->replyTo = $replyTo;
+
         return $this;
     }
-    
+
     /**
-     * Sets the subject
+     * Sets the subject.
      *
      * @param string $subject
      *
@@ -112,11 +117,12 @@ class EmailMessage implements MessageInterface
     public function setSubject(string $subject)
     {
         $this->subject = $subject;
+
         return $this;
     }
-    
+
     /**
-     * Sets the message as a HTML message
+     * Sets the message as a HTML message.
      *
      * @param string $html
      *
@@ -126,11 +132,12 @@ class EmailMessage implements MessageInterface
     {
         $this->isPlain = false;
         $this->body = $html;
+
         return $this;
     }
-    
+
     /**
-     * Sets the message as a plain text message
+     * Sets the message as a plain text message.
      *
      * @param string $text
      *
@@ -140,9 +147,10 @@ class EmailMessage implements MessageInterface
     {
         $this->isPlain = true;
         $this->body = $text;
+
         return $this;
     }
-    
+
     /**
      * @return string
      */
@@ -150,7 +158,7 @@ class EmailMessage implements MessageInterface
     {
         return (string) $this->from;
     }
-    
+
     /**
      * @return string
      */
@@ -158,7 +166,7 @@ class EmailMessage implements MessageInterface
     {
         return (string) $this->fromName;
     }
-    
+
     /**
      * @return string
      */
@@ -166,7 +174,7 @@ class EmailMessage implements MessageInterface
     {
         return (string) $this->replyTo;
     }
-    
+
     /**
      * @return string
      */
@@ -174,7 +182,7 @@ class EmailMessage implements MessageInterface
     {
         return (string) $this->subject;
     }
-    
+
     /**
      * @return string
      */
@@ -182,7 +190,7 @@ class EmailMessage implements MessageInterface
     {
         return (string) $this->body;
     }
-    
+
     /**
      * @return bool
      */
@@ -190,9 +198,9 @@ class EmailMessage implements MessageInterface
     {
         return $this->isPlain;
     }
-    
+
     /**
-     * Returns the content of the body of the message
+     * Returns the content of the body of the message.
      *
      * @return string
      */
@@ -200,18 +208,19 @@ class EmailMessage implements MessageInterface
     {
         return $this;
     }
-    
+
     /**
-     * Allows the message to be set
+     * Allows the message to be set.
      *
      * @param $message
      *
-     * @return $this
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function setMessage($message)
     {
-        if (!$message instanceof EmailMessage) {
+        if (!$message instanceof self) {
             throw new \InvalidArgumentException('setMessage expects an instance of EmailMessage');
         }
         $this->from = $message->getFrom();
@@ -220,6 +229,7 @@ class EmailMessage implements MessageInterface
         $this->body = $message->getBody();
         $this->replyTo = $message->getReplyTo();
         $this->isPlain = $message->isPlain();
+
         return $this;
     }
 }
