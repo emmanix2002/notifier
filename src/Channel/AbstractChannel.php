@@ -135,7 +135,6 @@ abstract class AbstractChannel implements ChannelInterface
                 break;
             }
         }
-
         return !is_bool($response) || !$response ? $response : $this->propagate();
     }
 }

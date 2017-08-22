@@ -126,7 +126,6 @@ class AmazonSesEmailHandler extends AbstractHandler
         } catch (\Throwable $e) {
             $this->processException($e);
         }
-
         return $this->propagate();
     }
 }

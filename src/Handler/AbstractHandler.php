@@ -24,7 +24,6 @@ abstract class AbstractHandler implements HandlerInterface
     protected function processException(\Throwable $e)
     {
         Notifier::getLogger()->error($e->getMessage());
-
         return $e;
     }
 }
