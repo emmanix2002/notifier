@@ -158,10 +158,13 @@ class EmailMessage implements MessageInterface
      */
     public function getFrom(bool $withName = true): string
     {
-        if (empty($this->getFromName())) {
+        if (!$withName || empty($this->getFromName())) {
             return (string) $this->from;
         }
-        return $this->getFromName()." <".$this->from.">";
+        if ($withName && !empty($this->getFromName())) {
+            return $this->getFromName()." <".$this->from.">";
+        }
+        return $this->from;
     }
 
     /**
