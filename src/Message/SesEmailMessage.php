@@ -16,7 +16,7 @@ class SesEmailMessage extends EmailMessage
         if ($instance === null) {
             return new static();
         }
-        $new = new static($instance->getFrom(), $instance->getSubject(), null, $instance->getReplyTo());
+        $new = new static($instance->getFrom(false), $instance->getSubject(), null, $instance->getReplyTo());
 
         return $new->setHtml($instance->getBody());
     }
