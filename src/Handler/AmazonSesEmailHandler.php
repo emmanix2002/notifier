@@ -91,7 +91,7 @@ class AmazonSesEmailHandler extends AbstractHandler
                 throw new \InvalidArgumentException('The message need to be an instance of EmailMessage');
             }
             if (!is_a($recipients->getRecipientClass(), EmailRecipient::class, true)) {
-                throw new \InvalidArgumentException('The recipient need to be an instance of EmailRecipient');
+                throw new \InvalidArgumentException('The recipient needs to be an instance [or subclass] of EmailRecipient');
             }
             if (empty($message->getSubject())) {
                 throw new \UnexpectedValueException('You have not added an email subject');
@@ -117,10 +117,15 @@ class AmazonSesEmailHandler extends AbstractHandler
                     # get the template id
                     $destinations = [];
                     # email destinations
-                    foreach ($recipientsChunk as $recipient) {
+                    $defaultReplacements = [];
+                    # the default replacements
+                    foreach ($recipientsChunk as $id => $recipient) {
                         # process the recipients
                         if (!$recipient instanceof SesBulkEmailRecipient) {
                             continue;
+                        }
+                        if ($id === 0) {
+                            $defaultReplacements = $recipient->getSubstitutions();
                         }
                         $mergeTags = [];
                         # the merge tags
@@ -137,9 +142,13 @@ class AmazonSesEmailHandler extends AbstractHandler
                         $destination['ReplacementTemplateData'] = json_encode($recipient->getSubstitutions());
                         $destinations[] = $destination;
                     }
-                    $chunkResults[] = $this->sesClient->sendEmail([
+                    foreach ($defaultReplacements as $key => $value) {
+                        $defaultReplacements[$key] = '';
+                    }
+                    $chunkResults[] = $this->sesClient->sendBulkTemplatedEmail([
                         'Source' => $message->getFrom(),
                         'ConfigurationSetName' => $message->getConfigSet(),
+                        'DefaultTemplateData' => json_encode($defaultReplacements),
                         'Template' => $templateId,
                         'Destinations' => $destinations,
                         'ReplyToAddresses' => [$message->getReplyTo()]
