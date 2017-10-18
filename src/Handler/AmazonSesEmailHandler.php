@@ -90,7 +90,7 @@ class AmazonSesEmailHandler extends AbstractHandler
             if (!$message instanceof EmailMessage) {
                 throw new \InvalidArgumentException('The message need to be an instance of EmailMessage');
             }
-            if (!$recipients->getRecipientClass() instanceof EmailRecipient) {
+            if (!is_a($recipients->getRecipientClass(), EmailRecipient::class, true)) {
                 throw new \InvalidArgumentException('The recipient need to be an instance of EmailRecipient');
             }
             if (empty($message->getSubject())) {
