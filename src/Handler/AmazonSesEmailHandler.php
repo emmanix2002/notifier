@@ -5,9 +5,12 @@ namespace Emmanix2002\Notifier\Handler;
 use Aws\Ses\SesClient;
 use Emmanix2002\Notifier\Message\EmailMessage;
 use Emmanix2002\Notifier\Message\MessageInterface;
+use Emmanix2002\Notifier\Message\SesBulkEmailMessage;
 use Emmanix2002\Notifier\Message\SesEmailMessage;
 use Emmanix2002\Notifier\Recipient\EmailRecipient;
 use Emmanix2002\Notifier\Recipient\RecipientCollection;
+use Emmanix2002\Notifier\Recipient\SesBulkEmailRecipient;
+use Ramsey\Uuid\Uuid;
 
 class AmazonSesEmailHandler extends AbstractHandler
 {
@@ -56,6 +59,27 @@ class AmazonSesEmailHandler extends AbstractHandler
     }
 
     /**
+     * Creates a template for the bulk message delivery
+     *
+     * @param SesBulkEmailMessage $message
+     *
+     * @return string
+     */
+    public function createTemplate(SesBulkEmailMessage $message)
+    {
+        $templateId = (new \DateTime())->format('Y-m-d').'_'.Uuid::uuid1()->toString();
+        $response = $this->sesClient->createTemplate([
+            'Template' => [
+                'HtmlPart' => $message->getHtmlBody(),
+                'SubjectPart' => $message->getSubject(),
+                'TemplateName' => $templateId,
+                'TextPart' => $message->getTextBody(),
+            ]
+        ]);
+        return $templateId;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function handle(MessageInterface $message, RecipientCollection $recipients)
@@ -65,6 +89,9 @@ class AmazonSesEmailHandler extends AbstractHandler
         try {
             if (!$message instanceof EmailMessage) {
                 throw new \InvalidArgumentException('The message need to be an instance of EmailMessage');
+            }
+            if (!$recipients->getRecipientClass() instanceof EmailRecipient) {
+                throw new \InvalidArgumentException('The recipient need to be an instance of EmailRecipient');
             }
             if (empty($message->getSubject())) {
                 throw new \UnexpectedValueException('You have not added an email subject');
@@ -83,41 +110,77 @@ class AmazonSesEmailHandler extends AbstractHandler
             // we break up everything into chunks of 50
             foreach ($chunks as $chunk) {
                 // process them one chunk at a time
-                $messageBody = [
-                    'Text' => ['Data' => $message->toPlainText(), 'Charset' => 'utf-8'],
-                ];
-                if (!$message->isPlain()) {
-                    // not a plain text only message
-                    $messageBody['Html'] = ['Data' => $message->getBody(), 'Charset' => 'utf-8'];
-                }
-                $addresses = ['To' => [], 'Cc' => [], 'Bcc' => []];
-                // our address container
-                $destinations = new RecipientCollection($chunk, $recipients->getRecipientClass());
+                $recipientsChunk = new RecipientCollection($chunk, $recipients->getRecipientClass());
                 // we create the destinations
-                foreach ($destinations as $recipient) {
-                    if (!$recipient instanceof EmailRecipient) {
-                        continue;
+                if ($message instanceof SesBulkEmailMessage) {
+                    $templateId = $this->createTemplate($message);
+                    # get the template id
+                    $destinations = [];
+                    # email destinations
+                    foreach ($recipientsChunk as $recipient) {
+                        # process the recipients
+                        if (!$recipient instanceof SesBulkEmailRecipient) {
+                            continue;
+                        }
+                        $mergeTags = [];
+                        # the merge tags
+                        foreach ($recipient->getSubstitutions() as $key => $value) {
+                            $mergeTags[] = ['Name' => $key, 'Value' => $value];
+                        }
+                        $destination['Destination'] = ['ToAddresses' => [$recipient->getAddress()]];
+                        if (!empty($recipient->getBcc())) {
+                            $destination['Destination']['BccAddresses'] = $recipient->getBcc();
+                        }
+                        if (!empty($recipient->getCc())) {
+                            $destination['Destination']['CcAddresses'] = $recipient->getCc();
+                        }
+                        $destination['ReplacementTemplateData'] = json_encode($recipient->getSubstitutions());
+                        $destinations[] = $destination;
                     }
-                    $addresses['To'][] = $recipient->getAddress();
-                    if (!empty($recipient->getCc())) {
-                        $addresses['Cc'] = array_merge($addresses['Cc'], $recipient->getCc());
+                    $chunkResults[] = $this->sesClient->sendEmail([
+                        'Source' => $message->getFrom(),
+                        'ConfigurationSetName' => $message->getConfigSet(),
+                        'Template' => $templateId,
+                        'Destinations' => $destinations,
+                        'ReplyToAddresses' => [$message->getReplyTo()]
+                    ]);
+
+                } else {
+                    # a different path of action
+                    $messageBody = [
+                        'Text' => ['Data' => $message->toPlainText(), 'Charset' => 'utf-8'],
+                    ];
+                    if (!$message->isPlain()) {
+                        // not a plain text only message
+                        $messageBody['Html'] = ['Data' => $message->getBody(), 'Charset' => 'utf-8'];
                     }
-                    if (!empty($recipient->getBcc())) {
-                        $addresses['Bcc'] = array_merge($addresses['Cc'], $recipient->getBcc());
+                    $addresses = ['To' => [], 'Cc' => [], 'Bcc' => []];
+                    // our address container
+                    foreach ($recipientsChunk as $recipient) {
+                        if (!$recipient instanceof EmailRecipient) {
+                            continue;
+                        }
+                        $addresses['To'][] = $recipient->getAddress();
+                        if (!empty($recipient->getCc())) {
+                            $addresses['Cc'] = array_merge($addresses['Cc'], $recipient->getCc());
+                        }
+                        if (!empty($recipient->getBcc())) {
+                            $addresses['Bcc'] = array_merge($addresses['Cc'], $recipient->getBcc());
+                        }
                     }
+                    $chunkResults[] = $this->sesClient->sendEmail([
+                        'Source'      => $message->getFrom(),
+                        'Destination' => [
+                            'ToAddresses'  => $addresses['To'],
+                            'CcAddresses'  => $addresses['Cc'],
+                            'BccAddresses' => $addresses['Bcc'],
+                        ],
+                        'Message' => [
+                            'Subject' => ['Data' => $message->getSubject()],
+                            'Body'    => $messageBody,
+                        ],
+                    ]);
                 }
-                $chunkResults[] = $this->sesClient->sendEmail([
-                    'Source'      => $message->getFrom(),
-                    'Destination' => [
-                        'ToAddresses'  => $addresses['To'],
-                        'CcAddresses'  => $addresses['Cc'],
-                        'BccAddresses' => $addresses['Bcc'],
-                    ],
-                    'Message' => [
-                        'Subject' => ['Data' => $message->getSubject()],
-                        'Body'    => $messageBody,
-                    ],
-                ]);
             }
             if ($this->stopPropagation) {
                 // not going any further
